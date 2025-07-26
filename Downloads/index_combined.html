@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveEasy - Premium Car Rentals</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+/* Global Styles */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #27ae60;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 25px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: var(--secondary);
+        }
+        
+        .mobile-menu {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1502877338535-766e1452684a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        /* Search Form */
+        .search-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            transform: translateY(50px);
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: modalopen 0.5s;
+        }
+        
+        @keyframes modalopen {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        /* Featured Cars */
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-top: 80px;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .section-title p {
+            color: #777;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .car-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .car-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .car-img {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .car-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .car-card:hover .car-img img {
+            transform: scale(1.1);
+        }
+        
+        .car-info {
+            padding: 20px;
+        }
+        
+        .car-info h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .car-specs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .car-spec {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            margin-bottom: 10px;
+            color: #777;
+        }
+        
+        .car-spec i {
+            margin-right: 5px;
+            color: var(--secondary);
+        }
+        
+        .car-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        
+        .price span {
+            font-size: 14px;
+            font-weight: 400;
+            color: #777;
+        }
+        
+        /* Why Choose Us */
+        .features {
+            background-color: var(--light);
+            padding: 80px 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 80px 0;
+            background-color: var(--dark);
+            color: white;
+        }
+        
+        .testimonials .section-title h2,
+        .testimonials .section-title p {
+            color: white;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .testimonial-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .testimonial-card::before {
+            content: '"';
+            font-size: 80px;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.1);
+            font-family: serif;
+        }
+        
+        .testimonial-text {
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .author-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .author-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .author-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .author-info p {
+            font-size: 14px;
+            color: #bbb;
+        }
+        
+        /* Booking Summary */
+        .booking-summary {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .summary-total {
+            font-weight: bold;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        /* Enhanced Form Styles */
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.form-actions .btn {
+    flex: 1;
+}
+
+small {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #777;
+}
+
+/* Confirmation Modal Styles */
+.confirmation-content {
+    text-align: center;
+    padding: 0 20px;
+}
+
+.confirmation-icon {
+    font-size: 60px;
+    color: var(--success);
+    margin-bottom: 20px;
+}
+
+.confirmation-details {
+    text-align: left;
+    margin: 30px 0;
+    background: rgba(0,0,0,0.03);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.detail-item {
+    display: flex;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--dark);
+    flex: 1;
+}
+
+.detail-value {
+    flex: 1;
+    text-align: right;
+}
+
+.confirmation-summary {
+    margin: 30px auto;
+    max-width: 400px;
+}
+
+.confirmation-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.confirmation-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.confirmation-actions .btn {
+    flex: 1;
+}
+
+/* Responsive Form Adjustments */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .confirmation-actions {
+        flex-direction: column;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+    }
+    
+    .detail-value {
+        text-align: left;
+        margin-top: 5px;
+    }
+}
+        
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-col h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+        
+        .footer-col ul {
+            list-style: none;
+        }
+        
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-col ul li a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-col ul li a:hover {
+            color: var(--secondary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bbb;
+            font-size: 14px;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary);
+                flex-direction: column;
+                padding: 20px 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+            
+            nav ul.show {
+                display: flex;
+            }
+            
+            nav ul li {
+                margin: 0;
+                text-align: center;
+                padding: 10px 0;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+        }
+</style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">Drive<span>Easy</span></a>
+            <nav>
+                <div class="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul id="nav-menu">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#cars">Cars</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Find Your Perfect Rental Car</h1>
+                <p>Choose from our wide selection of premium vehicles at competitive prices</p>
+                <a href="#cars" class="btn">Browse Cars</a>
+                
+                <!-- Search Form -->
+                <div class="search-container">
+                    <form class="search-form">
+                        <div class="form-group">
+                            <label for="pickup-location">Pickup Location</label>
+                            <select id="pickup-location" required>
+                                <option value="">Select location</option>
+                                <option value="nyc">New York City</option>
+                                <option value="la">Los Angeles</option>
+                                <option value="chicago">Chicago</option>
+                                <option value="miami">Miami</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pickup-date">Pickup Date</label>
+                            <input type="date" id="pickup-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="return-date">Return Date</label>
+                            <input type="date" id="return-date" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn" style="width: 100%;">Search Cars</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Cars -->
+    <section id="cars" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Fleet</h2>
+                <p>Explore our collection of vehicles suitable for any occasion</p>
+            </div>
+            
+            <div class="cars-grid">
+                <!-- Ambassador Non-AC -->
+                <div class="car-card">
+                    <div class="car-img">
+                        <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Ambassador Non-AC">
+                    </div>
+                    <div class="car-info">
+                        <h3>Ambassador Non-AC</h3>
+                        <div class="car-specs">
+                            <div class="car-spec"><i class="fas fa-car"></i> Sedan</div>
+                            <div class="car-spec"><i class="fas fa-users"></i> 5 Seats</div>
+                            <div class="car-spec"><i class="fas fa-snowflake"></i> Non-AC</div>
+                            <div class="car-spec"><i class="fas fa-gas-pump"></i> Petrol</div>
+                        </div>
+                        <div class="car-price">
+                            <div class="price">₹800 <span>/day</span></div>
+                            <button class="btn rent-btn" data-car="Ambassador Non-AC" data-price="800">Rent Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ambassador AC -->
+                <div class="car-card">
+                    <div class="car-img">
+                        <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Ambassador AC">
+                    </div>
+                    <div class="car-info">
+                        <h3>Ambassador AC</h3>
+                        <div class="car-specs">
+                            <div class="car-spec"><i class="fas fa-car"></i> Sedan</div>
+                            <div class="car-spec"><i class="fas fa-users"></i> 5 Seats</div>
+                            <div class="car-spec"><i class="fas fa-snowflake"></i> AC</div>
+                            <div class="car-spec"><i class="fas fa-gas-pump"></i> Petrol</div>
+                        </div>
+                        <div class="car-price">
+                            <div class="price">₹1200 <span>/day</span></div>
+                            <button class="btn rent-btn" data-car="Ambassador AC" data-price="1200">Rent Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tata Sumo Non-AC -->
+                <div class="car-card">
+                    <div class="car-img">
+                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Tata Sumo Non-AC">
+                    </div>
+                    <div class="car-info">
+                        <h3>Tata Sumo Non-AC</h3>
+                        <div class="car-specs">
+                            <div class="car-spec"><i class="fas fa-car"></i> SUV</div>
+                            <div class="car-spec"><i class="fas fa-users"></i> 7 Seats</div>
+                            <div class="car-spec"><i class="fas fa-snowflake"></i> Non-AC</div>
+                            <div class="car-spec"><i class="fas fa-gas-pump"></i> Diesel</div>
+                        </div>
+                        <div class="car-price">
+                            <div class="price">₹1000 <span>/day</span></div>
+                            <button class="btn rent-btn" data-car="Tata Sumo Non-AC" data-price="1000">Rent Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tata Sumo AC -->
+                <div class="car-card">
+                    <div class="car-img">
+                        <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Tata Sumo AC">
+                    </div>
+                    <div class="car-info">
+                        <h3>Tata Sumo AC</h3>
+                        <div class="car-specs">
+                            <div class="car-spec"><i class="fas fa-car"></i> SUV</div>
+                            <div class="car-spec"><i class="fas fa-users"></i> 7 Seats</div>
+                            <div class="car-spec"><i class="fas fa-snowflake"></i> AC</div>
+                            <div class="car-spec"><i class="fas fa-gas-pump"></i> Diesel</div>
+                        </div>
+                        <div class="car-price">
+                            <div class="price">₹1500 <span>/day</span></div>
+                            <button class="btn rent-btn" data-car="Tata Sumo AC" data-price="1500">Rent Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Maruti Omni -->
+                <div class="car-card">
+                    <div class="car-img">
+                        <img src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Maruti Omni">
+                    </div>
+                    <div class="car-info">
+                        <h3>Maruti Omni</h3>
+                        <div class="car-specs">
+                            <div class="car-spec"><i class="fas fa-car"></i> Van</div>
+                            <div class="car-spec"><i class="fas fa-users"></i> 8 Seats</div>
+                            <div class="car-spec"><i class="fas fa-snowflake"></i> Non-AC</div>
+                            <div class="car-spec"><i class="fas fa-gas-pump"></i> Petrol</div>
+                        </div>
+                        <div class="car-price">
+                            <div class="price">₹700 <span>/day</span></div>
+                            <button class="btn rent-btn" data-car="Maruti Omni" data-price="700">Rent Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Maruti Esteem -->
+                <div class="car-card">
+                    <div class="car-img">
+                        <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Maruti Esteem">
+                    </div>
+                    <div class="car-info">
+                        <h3>Maruti Esteem</h3>
+                        <div class="car-specs">
+                            <div class="car-spec"><i class="fas fa-car"></i> Sedan</div>
+                            <div class="car-spec"><i class="fas fa-users"></i> 5 Seats</div>
+                            <div class="car-spec"><i class="fas fa-snowflake"></i> AC</div>
+                            <div class="car-spec"><i class="fas fa-gas-pump"></i> Petrol</div>
+                        </div>
+                        <div class="car-price">
+                            <div class="price">₹1100 <span>/day</span></div>
+                            <button class="btn rent-btn" data-car="Maruti Esteem" data-price="1100">Rent Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mahindra Armada -->
+                <div class="car-card">
+                    <div class="car-img">
+                        <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Mahindra Armada">
+                    </div>
+                    <div class="car-info">
+                        <h3>Mahindra Armada</h3>
+                        <div class="car-specs">
+                            <div class="car-spec"><i class="fas fa-car"></i> SUV</div>
+                            <div class="car-spec"><i class="fas fa-users"></i> 7 Seats</div>
+                            <div class="car-spec"><i class="fas fa-snowflake"></i> Non-AC</div>
+                            <div class="car-spec"><i class="fas fa-gas-pump"></i> Diesel</div>
+                        </div>
+                        <div class="car-price">
+                            <div class="price">₹900 <span>/day</span></div>
+                            <button class="btn rent-btn" data-car="Mahindra Armada" data-price="900">Rent Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section id="about" class="features section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Choose DriveEasy</h2>
+                <p>We provide the best car rental experience with our premium services</p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3>Wide Selection</h3>
+                    <p>Choose from our diverse fleet of vehicles to suit any need and budget.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h3>Competitive Prices</h3>
+                    <p>Get the best value for your money with our affordable rental rates.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Our customer service team is available round the clock to assist you.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Fully Insured</h3>
+                    <p>All our vehicles come with comprehensive insurance coverage.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="testimonials section">
+        <div class="container">
+            <div class="section-title">
+                <h2>What Our Customers Say</h2>
+                <p>Hear from our satisfied customers about their experience with DriveEasy</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <p>I've rented from DriveEasy multiple times and they never disappoint. The cars are always clean, well-maintained, and the staff is incredibly helpful.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-img">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="John D.">
+                        </div>
+                        <div class="author-info">
+                            <h4>John D.</h4>
+                            <p>Business Traveler</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <p>The booking process was so easy and the pickup was seamless. The car was exactly as described and perfect for our family vacation.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-img">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah M.">
+                        </div>
+                        <div class="author-info">
+                            <h4>Sarah M.</h4>
+                            <p>Family Vacation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <p>As a frequent business traveler, I appreciate the reliability and quality of DriveEasy's service. Their premium vehicles make my trips much more comfortable.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-img">
+                            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Michael T.">
+                        </div>
+                        <div class="author-info">
+                            <h4>Michael T.</h4>
+                            <p>Corporate Client</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal -->
+<!-- Booking Modal -->
+<div id="booking-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2 class="modal-title">Book Your Car</h2>
+        
+        <form id="booking-form">
+            <input type="hidden" id="selected-car">
+            <input type="hidden" id="daily-rate">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="customer-name">Full Name*</label>
+                    <input type="text" id="customer-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customer-email">Email*</label>
+                    <input type="email" id="customer-email" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="customer-phone">Phone Number*</label>
+                    <input type="tel" id="customer-phone" pattern="[0-9]{10}" required>
+                    <small>10-digit number</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pickup-location-booking">Pickup Location*</label>
+                    <select id="pickup-location-booking" required>
+                        <option value="">Select location</option>
+                        <option value="main-office">Main Office - 123 Rental St, New York</option>
+                        <option value="airport">Airport Branch</option>
+                        <option value="downtown">Downtown Branch</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="customer-address">Delivery Address*</label>
+                <textarea id="customer-address" rows="2" required></textarea>
+                <small>Leave blank if picking up at location</small>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="booking-pickup-date">Pickup Date*</label>
+                    <input type="date" id="booking-pickup-date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="booking-return-date">Return Date*</label>
+                    <input type="date" id="booking-return-date" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="estimated-km">Estimated Kilometers*</label>
+                    <input type="number" id="estimated-km" min="50" required>
+                    <small>Minimum 50 km</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="driver-option">Driver Option*</label>
+                    <select id="driver-option" required>
+                        <option value="self-drive">Self Drive</option>
+                        <option value="with-driver">With Driver (+₹500/day)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="payment-method">Payment Method*</label>
+                <select id="payment-method" required>
+                    <option value="">Select method</option>
+                    <option value="credit-card">Credit Card</option>
+                    <option value="debit-card">Debit Card</option>
+                    <option value="net-banking">Net Banking</option>
+                    <option value="upi">UPI</option>
+                    <option value="cash">Cash (On Pickup)</option>
+                </select>
+            </div>
+            
+            <div class="booking-summary">
+                <h4><i class="fas fa-receipt"></i> Booking Summary</h4>
+                <div class="summary-item">
+                    <span>Car Model:</span>
+                    <span id="summary-car">-</span>
+                </div>
+                <div class="summary-item">
+                    <span>Daily Rate:</span>
+                    <span id="summary-rate">₹0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Rental Days:</span>
+                    <span id="summary-days">0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Driver Fee:</span>
+                    <span id="summary-driver">₹0</span>
+                </div>
+                <div class="summary-item summary-total">
+                    <span>Total Amount:</span>
+                    <span id="summary-total">₹0</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="advance-payment">Advance Payment* (Minimum 30%)</label>
+                <input type="number" id="advance-payment" min="0" required>
+                <small>Remaining balance payable at pickup</small>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn">
+                    <i class="fas fa-check-circle"></i> Confirm Booking
+                </button>
+                <button type="button" class="btn btn-outline" id="cancel-booking">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+    <!-- Confirmation Modal -->
+<!-- Confirmation Modal -->
+<div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div class="confirmation-content">
+            <div class="confirmation-header">
+                <i class="fas fa-check-circle confirmation-icon"></i>
+                <h2 class="modal-title">Booking Confirmed!</h2>
+                <p>Thank you for choosing DriveEasy. Your booking details are below:</p>
+            </div>
+            
+            <div class="confirmation-details">
+                <div class="detail-item">
+                    <span class="detail-label">Booking Reference:</span>
+                    <span class="detail-value" id="confirmation-ref">DE-123456</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Customer Name:</span>
+                    <span class="detail-value" id="confirmation-name">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Vehicle:</span>
+                    <span class="detail-value" id="confirmation-car">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Rental Period:</span>
+                    <span class="detail-value" id="confirmation-dates">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Pickup Location:</span>
+                    <span class="detail-value" id="confirmation-pickup">-</span>
+                </div>
+            </div>
+            
+            <div class="booking-summary confirmation-summary">
+                <div class="summary-item">
+                    <span>Total Amount:</span>
+                    <span id="confirmation-total">₹0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Advance Paid:</span>
+                    <span id="confirmation-advance">₹0</span>
+                </div>
+                <div class="summary-item summary-total">
+                    <span>Balance Due:</span>
+                    <span id="confirmation-balance">₹0</span>
+                </div>
+            </div>
+            
+            <div class="confirmation-footer">
+                <p><i class="fas fa-envelope"></i> A confirmation has been sent to your email address.</p>
+                <p><i class="fas fa-phone"></i> Our team will contact you shortly to finalize the details.</p>
+                
+                <div class="confirmation-actions">
+                    <button class="btn" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print Receipt
+                    </button>
+                    <button class="btn btn-outline close-modal">
+                        <i class="fas fa-home"></i> Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Column 1 -->
+                <div class="footer-col">
+                    <h3>DriveEasy</h3>
+                    <p>Premium car rental service with a wide selection of vehicles to suit all your needs.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Column 2 -->
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#cars">Our Fleet</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3 -->
+                <div class="footer-col">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#">Short-term Rentals</a></li>
+                        <li><a href="#">Long-term Rentals</a></li>
+                        <li><a href="#">Business Rentals</a></li>
+                        <li><a href="#">Luxury Vehicles</a></li>
+                        <li><a href="#">Airport Pickup</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4 -->
+                <div class="footer-col">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Rental St, New York, NY</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@driveeasy.com</li>
+                        <li><i class="fas fa-clock"></i> Mon-Sun: 24/7</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 DriveEasy Car Rentals. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+// Mobile Menu Toggle
+    document.querySelector('.mobile-menu').addEventListener('click', function() {
+        document.getElementById('nav-menu').classList.toggle('show');
+    });
+
+    // DOM Elements
+    const rentButtons = document.querySelectorAll('.rent-btn');
+    const bookingModal = document.getElementById('booking-modal');
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const closeModalButtons = document.querySelectorAll('.close-modal, #cancel-booking');
+    const bookingForm = document.getElementById('booking-form');
+    const searchForm = document.querySelector('.search-form');
+    
+    // Initialize date pickers
+    function initDatePickers() {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const formatDate = (date) => date.toISOString().split('T')[0];
+        
+        // Search form dates
+        document.getElementById('pickup-date').value = formatDate(today);
+        document.getElementById('pickup-date').min = formatDate(today);
+        document.getElementById('return-date').value = formatDate(tomorrow);
+        document.getElementById('return-date').min = formatDate(tomorrow);
+        
+        // Booking form dates
+        document.getElementById('booking-pickup-date').value = formatDate(today);
+        document.getElementById('booking-pickup-date').min = formatDate(today);
+        document.getElementById('booking-return-date').value = formatDate(tomorrow);
+        document.getElementById('booking-return-date').min = formatDate(tomorrow);
+    }
+    
+    // Open Booking Modal
+    function openBookingModal(car, price) {
+        document.getElementById('selected-car').value = car;
+        document.getElementById('daily-rate').value = price;
+        
+        // Update summary
+        document.getElementById('summary-car').textContent = car;
+        document.getElementById('summary-rate').textContent = `₹${price}`;
+        
+        initDatePickers();
+        calculateTotal();
+        
+        bookingModal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+
+    // Close Modals
+    function closeModals() {
+        bookingModal.style.display = 'none';
+        confirmationModal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+    }
+
+    // Event Listeners
+    rentButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            openBookingModal(
+                this.getAttribute('data-car'),
+                this.getAttribute('data-price')
+            );
+        });
+    });
+
+    closeModalButtons.forEach(button => {
+        button.addEventListener('click', closeModals);
+    });
+
+    window.addEventListener('click', function(event) {
+        if (event.target === bookingModal || event.target === confirmationModal) {
+            closeModals();
+        }
+    });
+
+    // Calculate rental cost
+    function calculateTotal() {
+        const pickupDate = new Date(pickupDateInput.value);
+        const returnDate = new Date(returnDateInput.value);
+        const driverOption = document.getElementById('driver-option');
+        
+        if (pickupDate && returnDate && returnDate > pickupDate) {
+            const days = Math.ceil((returnDate - pickupDate) / (1000 * 60 * 60 * 24));
+            const dailyRate = parseInt(document.getElementById('daily-rate').value);
+            const driverFee = driverOption.value === 'with-driver' ? 500 : 0;
+            const total = (dailyRate * days) + (driverFee * days);
+            
+            document.getElementById('summary-days').textContent = days;
+            document.getElementById('summary-driver').textContent = `₹${driverFee * days}`;
+            document.getElementById('summary-total').textContent = `₹${total}`;
+            
+            // Set minimum advance payment (30%)
+            const advanceInput = document.getElementById('advance-payment');
+            advanceInput.min = Math.ceil(total * 0.3);
+            advanceInput.max = total;
+            advanceInput.placeholder = `Minimum ₹${advanceInput.min}`;
+            
+            // Validate advance payment in real-time
+            if (parseInt(advanceInput.value) < parseInt(advanceInput.min)) {
+                advanceInput.setCustomValidity(`Minimum advance is ₹${advanceInput.min}`);
+            } else {
+                advanceInput.setCustomValidity('');
+            }
+        }
+    }
+
+    // Form elements with change listeners
+    const pickupDateInput = document.getElementById('booking-pickup-date');
+    const returnDateInput = document.getElementById('booking-return-date');
+    const driverOption = document.getElementById('driver-option');
+    const advancePayment = document.getElementById('advance-payment');
+    
+    [pickupDateInput, returnDateInput, driverOption, advancePayment].forEach(element => {
+        element.addEventListener('change', calculateTotal);
+        element.addEventListener('input', calculateTotal);
+    });
+
+    // Handle form submission
+    bookingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!this.checkValidity()) {
+            this.reportValidity();
+            return;
+        }
+        
+        // Get form values
+        const formData = {
+            car: document.getElementById('selected-car').value,
+            name: document.getElementById('customer-name').value,
+            email: document.getElementById('customer-email').value,
+            phone: document.getElementById('customer-phone').value,
+            address: document.getElementById('customer-address').value,
+            pickupLocation: document.getElementById('pickup-location-booking').value,
+            pickupDate: document.getElementById('booking-pickup-date').value,
+            returnDate: document.getElementById('booking-return-date').value,
+            estimatedKm: document.getElementById('estimated-km').value,
+            driverOption: document.getElementById('driver-option').value,
+            paymentMethod: document.getElementById('payment-method').value,
+            totalAmount: document.getElementById('summary-total').textContent,
+            advancePaid: document.getElementById('advance-payment').value,
+            bookingRef: 'DE-' + Math.floor(Math.random() * 1000000)
+        };
+        
+        // Update confirmation modal
+        document.getElementById('confirmation-car').textContent = formData.car;
+        document.getElementById('confirmation-name').textContent = formData.name;
+        document.getElementById('confirmation-ref').textContent = formData.bookingRef;
+        document.getElementById('confirmation-dates').textContent = 
+            `${new Date(formData.pickupDate).toLocaleDateString()} to ${new Date(formData.returnDate).toLocaleDateString()}`;
+        document.getElementById('confirmation-pickup').textContent = 
+            document.getElementById('pickup-location-booking').options[document.getElementById('pickup-location-booking').selectedIndex].text;
+        document.getElementById('confirmation-total').textContent = formData.totalAmount;
+        document.getElementById('confirmation-advance').textContent = `₹${formData.advancePaid}`;
+        document.getElementById('confirmation-balance').textContent = 
+            `₹${parseInt(formData.totalAmount.replace('₹','')) - parseInt(formData.advancePaid)}`;
+        
+        // Show confirmation modal
+        bookingModal.style.display = 'none';
+        confirmationModal.style.display = 'block';
+        
+        // Reset form
+        bookingForm.reset();
+        localStorage.setItem('lastBooking', JSON.stringify(formData));
+    });
+
+    // Search form handling
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const location = document.getElementById('pickup-location').value;
+            const pickupDate = document.getElementById('pickup-date').value;
+            const returnDate = document.getElementById('return-date').value;
+            
+            // In a real app, you would filter cars here
+            alert(`Searching for cars at ${location} from ${pickupDate} to ${returnDate}`);
+            document.getElementById('cars').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    // Initialize date pickers on load
+    document.addEventListener('DOMContentLoaded', function() {
+        initDatePickers();
+        
+        // Load last booking if exists (for demo purposes)
+        const lastBooking = localStorage.getItem('lastBooking');
+        if (lastBooking) {
+            console.log('Last booking:', JSON.parse(lastBooking));
+        }
+    });
+</script>
+</body>
+</html>
