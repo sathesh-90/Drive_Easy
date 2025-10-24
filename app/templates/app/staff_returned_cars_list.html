@@ -1,0 +1,641 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+/* ====== VARIABLES & RESET ====== */
+:root {
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+   --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #27ae60;
+}
+
+.returned-cars-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ====== TYPOGRAPHY ====== */
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--dark);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-subtitle {
+  text-align: center;
+  color: var(--secondary);
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-title::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+  border-radius: 2px;
+}
+
+/* ====== FILTER CONTROLS ====== */
+.filter-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-btn {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.filter-btn:hover:not(.active) {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* ====== BOOKING CARDS ====== */
+.bookings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.booking-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.booking-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.booking-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--success), #059669);
+}
+
+.booking-image-container {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.booking-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.booking-card:hover .booking-image {
+  transform: scale(1.05);
+}
+
+.booking-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--success);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.booking-content {
+  padding: 1.5rem;
+}
+
+.booking-header {
+  margin-bottom: 1rem;
+}
+
+.booking-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 0.25rem;
+}
+
+.booking-subtitle {
+  color: var(--secondary);
+  font-size: 0.9rem;
+}
+
+.drive-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: #e0e7ff;
+  color: #3730a3;
+  margin-top: 0.5rem;
+}
+
+/* ====== BOOKING DETAILS ====== */
+.booking-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.booking-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--light);
+  border-radius: 8px;
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+/* ====== PAYMENT SUMMARY ====== */
+.payment-summary {
+  background: linear-gradient(135deg, #f0f9ff, #e0f7fa);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #bae6fd;
+  margin: 1.5rem 0;
+}
+
+.payment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.payment-item:last-child {
+  border-bottom: none;
+}
+
+.payment-label {
+  color: var(--secondary);
+}
+
+.payment-value {
+  font-weight: 600;
+}
+
+.payment-total {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.payment-breakdown {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+}
+
+/* ====== DAMAGE INDICATOR ====== */
+.damage-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.damage-true {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.damage-false {
+  background: #dcfce7;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+/* ====== LOCATION ROUTE ====== */
+.location-route {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+}
+
+.route-point {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.route-pickup .route-icon {
+  color: var(--success);
+}
+
+.route-drop .route-icon {
+  color: var(--primary);
+}
+
+.route-arrow {
+  color: var(--secondary);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* ====== DATE TIME DISPLAY ====== */
+.datetime-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.datetime-icon {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+/* ====== EMPTY STATE ====== */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin: 2rem 0;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 1rem;
+}
+
+.empty-state-description {
+  color: var(--secondary);
+  margin-bottom: 2rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 768px) {
+  .returned-cars-container {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .bookings-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .booking-details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-controls {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-card {
+    margin: 0 -1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .booking-content {
+    padding: 1rem;
+  }
+}
+
+/* ====== ANIMATIONS ====== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.booking-card {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* ====== STATS SUMMARY ====== */
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: var(--secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+</style>
+
+<div class="returned-cars-container">
+  <h1 class="page-title">Returned Cars</h1>
+
+  <!-- Filter Controls -->
+  <div class="filter-controls">
+    <button class="filter-btn active" data-filter="all">All Returns</button>
+    <button class="filter-btn" data-filter="damage">With Damage</button>
+    <button class="filter-btn" data-filter="self_drive">Self Drive</button>
+    <button class="filter-btn" data-filter="with_driver">With Driver</button>
+    <button class="filter-btn" data-filter="pending">Pending Payments</button>
+  </div>
+
+  {% if bookings %}
+    <div class="bookings-grid">
+      {% for booking in bookings %}
+        <div class="booking-card" data-drive-type="{{ booking.drive_type }}" data-damage="{{ booking.damage_reported|yesno:'true,false' }}" data-pending="{{ booking.pending_payment|yesno:'true,false' }}">
+          <!-- Car Image -->
+          <div class="booking-image-container">
+            <img src="{{ booking.car.image.url }}" class="booking-image" alt="{{ booking.car.category }}">
+            <div class="booking-badge">
+              <i class="fas fa-check-circle"></i>  Returned
+            </div>
+          </div>
+
+          <div class="booking-content">
+            <!-- Header -->
+            <div class="booking-header">
+              <h3 class="booking-title">{{ booking.car.category }} - {{ booking.car.ac_type }}</h3>
+              <p class="booking-subtitle">{{ booking.car.brand }}</p>
+              <div class="drive-type-badge">
+                <i class="fas fa-{% if booking.drive_type == 'self_drive' %}car{% else %}user-tie{% endif %}"></i>
+                {{ booking.get_drive_type_display }}
+              </div>
+            </div>
+
+            <!-- Location Route -->
+            <div class="location-route">
+              <div class="route-point route-pickup">
+                <i class="fas fa-map-marker-alt route-icon"></i>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.9rem;">Pickup</div>
+                  <div style="font-size: 0.8rem;">{{ booking.pickup_location }}</div>
+                </div>
+              </div>
+              <div class="route-arrow">→</div>
+              <div class="route-point route-drop">
+                <i class="fas fa-flag-checkered route-icon"></i>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.9rem;">Drop</div>
+                  <div style="font-size: 0.8rem;">{{ booking.drop_location }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Booking Details -->
+            <div class="booking-details-grid">
+              <div class="booking-detail-item">
+                <span class="detail-label">Start Date & Time</span>
+                <div class="datetime-display">
+                  <i class="fas fa-calendar-alt datetime-icon"></i>
+                  <span class="detail-value">{{ booking.start_datetime|date:"M d, Y" }}</span>
+                </div>
+                <div class="datetime-display">
+                  <i class="fas fa-clock datetime-icon"></i>
+                  <span class="detail-value">{{ booking.start_datetime|time:"H:i" }}</span>
+                </div>
+              </div>
+              
+              <div class="booking-detail-item">
+                <span class="detail-label">Returned At</span>
+                <div class="datetime-display">
+                  <i class="fas fa-calendar-check datetime-icon"></i>
+                  <span class="detail-value">{{ booking.returned_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="datetime-display">
+                  <i class="fas fa-clock datetime-icon"></i>
+                  <span class="detail-value">{{ booking.returned_at|time:"H:i" }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="payment-summary">
+              <h4 class="section-title">Payment Summary</h4>
+              
+              <div class="payment-item">
+                <span class="payment-label">Pending Amount</span>
+                <span class="payment-value">₹{{  booking.pending_payment|floatformat:2 }}</span>
+              </div>
+              
+              <div class="payment-item">
+                <span class="payment-label">Advance Paid</span>
+                <span class="payment-value">₹{{ booking.advance_payment|floatformat:2 }}</span>
+              </div>
+              
+              <div class="payment-breakdown">
+                <div class="payment-item">
+                  <span class="payment-label">Total Amount</span>
+                  <span class="payment-value payment-total">₹{{ booking.total_amount|floatformat:2 }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Damage Report -->
+            <div class="damage-indicator {% if booking.damage_reported %}damage-true{% else %}damage-false{% endif %}">
+              <i class="fas fa-{% if booking.damage_reported %}exclamation-triangle{% else %}check-shield{% endif %}"></i>
+              {% if booking.damage_reported %}
+                Damage Reported - Fee: ₹{{ booking.damage_fee|floatformat:2 }}
+              {% else %}
+                No Damage Reported
+              {% endif %}
+            </div>
+
+            <!-- Additional Info -->
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; color: var(--secondary);">
+                <span>Booking ID: #{{ booking.id }}</span>
+                <span>Duration: {{ booking.hours_used }} hours</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-state-icon">🚗</div>
+      <h3 class="empty-state-title">No Returned Cars Yet</h3>
+      <p class="empty-state-description">
+        When cars are returned by customers, they will appear here with complete return details and payment information.
+      </p>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Filter functionality
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const bookingCards = document.querySelectorAll('.booking-card');
+  
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Update active button
+      filterBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      const filter = this.dataset.filter;
+      
+      // Filter cards
+      bookingCards.forEach(card => {
+        switch(filter) {
+          case 'all':
+            card.style.display = 'block';
+            break;
+          case 'damage':
+            card.style.display = card.dataset.damage === 'true' ? 'block' : 'none';
+            break;
+          case 'self_drive':
+            card.style.display = card.dataset.driveType === 'self_drive' ? 'block' : 'none';
+            break;
+          case 'with_driver':
+            card.style.display = card.dataset.driveType === 'with_driver' ? 'block' : 'none';
+            break;
+          case 'pending':
+            card.style.display = card.dataset.pending === 'true' ? 'block' : 'none';
+            break;
+        }
+        
+        // Add animation when showing
+        if (card.style.display === 'block') {
+          card.style.animation = 'fadeIn 0.5s ease';
+        }
+      });
+    });
+  });
+
+  // Add hover effects
+  bookingCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-5px)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+    });
+  });
+});
+</script>
+{% endblock %}

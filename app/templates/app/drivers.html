@@ -1,0 +1,129 @@
+{% extends 'app/base.html' %}
+{% block title %}Drivers{% endblock %}
+
+{% block content %}
+<h2>Drivers List</h2>
+
+{% if drivers %}
+    <div id="driversContainer">
+        {% for driver in drivers %}
+            <div class="driver-card">
+                <img src="{{ driver.image.url }}" width="150" alt="{{ driver.name }}">
+                <div class="driver-details">
+                    <p><strong>License Number:</strong> {{ driver.license_number }}</p>
+                    <p><strong>Aadhar Number:</strong> {{ driver.aadhar_number }}</p>
+                    <p><strong>Phone:</strong> {{ driver.phone }}</p>
+                    {% if driver.assigned_car %}
+                        <p><strong>Driver Status:</strong> {{ driver.status }}</p>
+    
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No drivers available.</p>
+{% endif %}
+
+<a href="{% url 'index' %}" class="back-btn">← Dashboard</a>
+<style>
+/* Container and cards */
+#driversContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.driver-card {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.driver-card:hover {
+    transform: scale(1.02);
+}
+
+/* Driver header */
+.driver-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.toggle-btn {
+    padding: 5px 10px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.toggle-btn:hover {
+    background-color: #1d4ed8;
+}
+
+/* Details */
+.driver-details {
+    margin-top: 10px;
+}
+
+/* Image - fixed size for all */
+.driver-card img {
+    width: 150px;       /* fixed width */
+    height: 150px;      /* fixed height */
+    display: block;
+    margin: 10px auto;
+    border-radius: 5px;
+    object-fit: cover;  /* ensures the image fills the box without distortion */
+}
+
+/* Back button */
+.back-btn {
+    margin-top: 20px;
+    padding: 10px 5px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+    padding: 10px 15px; 
+    background-color: #f59e0b;
+    transition: background-color 0.2s;
+}
+
+.back-btn-container {
+    text-align: center;  
+    margin-top: 20px;
+}
+.back-btn:hover {
+    background-color: #d97706;
+}
+.back-btn-container {
+    display: flex;
+    justify-content: center;  
+    margin-top: 20px;
+}
+</style>
+
+
+<script>
+// Toggle driver details
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const details = btn.closest('.driver-card').querySelector('.driver-details');
+        details.style.display = (details.style.display === 'none' || details.style.display === '') ? 'block' : 'none';
+    });
+});
+
+// Search filter
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+    const filter = searchInput.value.toLowerCase();
+    document.querySelectorAll('.driver-card').forEach(card => {
+        const name = card.querySelector('h3').textContent.toLowerCase();
+        card.style.display = name.includes(filter) ? 'block' : 'none';
+    });
+});
+</script>
+
+{% endblock %}

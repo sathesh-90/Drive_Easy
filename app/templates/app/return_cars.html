@@ -1,0 +1,649 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+/* ====== VARIABLES & RESET ====== */
+:root {
+  
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+
+     --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #27ae60;
+}
+
+.booking-history-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* ====== TYPOGRAPHY ====== */
+.booking-history-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--dark);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.booking-history-subtitle {
+  text-align: center;
+  color: var(--secondary);
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+  border-radius: 2px;
+}
+
+/* ====== CARD COMPONENTS ====== */
+.booking-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.booking-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--light);
+  display: flex;
+  justify-content: between;
+  align-items: center;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* ====== BOOKING GRID ====== */
+.booking-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.booking-image-container {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.booking-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.booking-image-container:hover .booking-image {
+  transform: scale(1.05);
+}
+
+.booking-status-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.status-ongoing {
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+  color: #92400e;
+}
+
+.status-returned {
+  background: linear-gradient(135deg, #dcfce7, #10b981);
+  color: #166534;
+}
+
+/* ====== BOOKING DETAILS ====== */
+.booking-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.booking-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--light);
+  border-radius: 8px;
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+/* ====== FARE SUMMARY ====== */
+.fare-summary {
+  background: linear-gradient(135deg, #f0f9ff, #e0f7fa);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #bae6fd;
+  margin: 1.5rem 0;
+}
+
+.fare-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.fare-item:last-child {
+  border-bottom: none;
+}
+
+.fare-label {
+  color: var(--secondary);
+}
+
+.fare-value {
+  font-weight: 600;
+}
+
+.fare-total {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.fare-breakdown {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+}
+
+.damage-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.damage-true {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.damage-false {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+/* ====== BUTTONS ====== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success), #059669);
+  color: white;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ====== EMPTY STATE ====== */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 1rem;
+}
+
+.empty-state-description {
+  color: var(--secondary);
+  margin-bottom: 2rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ====== ALERTS ====== */
+.alert {
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.alert-success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.alert-warning {
+  background: #fffbeb;
+  border-color: #fed7aa;
+  color: #ea580c;
+}
+
+.alert-info {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  color: #0369a1;
+}
+
+.alert-dismissible {
+  position: relative;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 968px) {
+  .booking-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .booking-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .booking-history-title {
+    font-size: 1.75rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .fare-summary {
+    padding: 1rem;
+  }
+}
+
+/* ====== ANIMATIONS ====== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.booking-card {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* ====== DATE STYLING ====== */
+.datetime-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.datetime-icon {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+/* ====== LOCATION STYLING ====== */
+.location-route {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.route-arrow {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* ====== DRIVE TYPE BADGE ====== */
+.drive-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: #e0e7ff;
+  color: #3730a3;
+}
+</style>
+
+<div class="booking-history-container">
+  <h1 class="booking-history-title">My Returned Cars</h1>
+  <p class="booking-history-subtitle">Manage and track your vehicle rentals</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible">
+        <div class="alert-content">
+          <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+        <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if bookings  %}
+    <div class="booking-grid">
+      {% for booking in bookings %}
+        <div class="booking-card">
+          <div class="card-header">
+            <h3 class="section-title">Booking #{{ booking.id }}</h3>
+            <div class="booking-status-badge {% if booking.is_returned %}status-returned{% else %}status-ongoing{% endif %}">
+              <i class="fas fa-{% if booking.is_returned %}check-circle{% else %}clock{% endif %}"></i>
+              {% if booking.is_returned %}Returned{% else %}Ongoing{% endif %}
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <!-- Car Image and Basic Info -->
+            <div class="booking-image-container">
+              <img src="{{ booking.car.image.url }}" class="booking-image" alt="{{ booking.car.category }}">
+            </div>
+            
+            <h4>{{ booking.car.category }} - {{ booking.car.model_name }}</h4>
+            <p class="text-muted">{{ booking.car.brand }}</p>
+            
+            <div class="drive-type-badge">
+              <i class="fas fa-{% if booking.drive_type == 'self_drive' %}car{% else %}user-tie{% endif %}"></i>
+              {{ booking.get_drive_type_display }}
+            </div>
+
+            <!-- Location Route -->
+            <div class="location-route">
+              <div class="location-pickup">
+                <i class="fas fa-map-marker-alt text-success"></i>
+                <strong>{{ booking.pickup_location }}</strong>
+              </div>
+              <div class="route-arrow">→</div>
+              <div class="location-drop">
+                <i class="fas fa-flag-checkered text-primary"></i>
+                <strong>{{ booking.drop_location }}</strong>
+              </div>
+            </div>
+
+            <!-- Booking Details Grid -->
+            <div class="booking-details-grid">
+              <div class="booking-detail-item">
+                <span class="detail-label">Start Date & Time</span>
+                <div class="datetime-display">
+                  <i class="fas fa-calendar-alt datetime-icon"></i>
+                  <span class="detail-value">{{ booking.start_datetime|date:"M d, Y" }}</span>
+                </div>
+                <div class="datetime-display">
+                  <i class="fas fa-clock datetime-icon"></i>
+                  <span class="detail-value">{{ booking.start_datetime|time:"H:i" }}</span>
+                </div>
+              </div>
+              
+              <div class="booking-detail-item">
+                <span class="detail-label">Expected Return</span>
+                <div class="datetime-display">
+                  <i class="fas fa-calendar-alt datetime-icon"></i>
+                  <span class="detail-value">{{ booking.expected_return_datetime|date:"M d, Y" }}</span>
+                </div>
+                <div class="datetime-display">
+                  <i class="fas fa-clock datetime-icon"></i>
+                  <span class="detail-value">{{ booking.expected_return_datetime|time:"H:i" }}</span>
+                </div>
+              </div>
+              
+              <div class="booking-detail-item">
+                <span class="detail-label">Estimated Hours</span>
+                <span class="detail-value">{{ booking.hours_used }} hours</span>
+              </div>
+              
+              <div class="booking-detail-item">
+                <span class="detail-label">Estimated Distance</span>
+                <span class="detail-value">{{ booking.km_to_destination }} KM</span>
+              </div>
+            </div>
+
+            <!-- Fare Summary -->
+            <div class="fare-summary">
+              <h4 class="section-title">Payment Summary</h4>
+              
+              <div class="fare-item">
+                <span class="fare-label">Base Amount</span>
+                <span class="fare-value">₹<span class="total-amount">{{ booking.total_amount|floatformat:2 }}</span></span>
+              </div>
+              
+              <div class="fare-item">
+                <span class="fare-label">Advance Paid</span>
+                <span class="fare-value">₹<span class="advance-payment">{{ booking.advance_payment|floatformat:2 }}</span></span>
+              </div>
+              
+              <div class="fare-item">
+                <span class="fare-label">Damage Status</span>
+                <span class="damage-indicator {% if booking.damage_reported %}damage-true{% else %}damage-false{% endif %}">
+                  <i class="fas fa-{% if booking.damage_reported %}exclamation-triangle{% else %}check-shield{% endif %}"></i>
+                  {% if booking.damage_reported %}Damage Reported{% else %}No Damage{% endif %}
+                </span>
+              </div>
+              
+              {% if booking.damage_reported %}
+                <div class="fare-item">
+                  <span class="fare-label">Damage Fee</span>
+                  <span class="fare-value">₹<span class="damage-fee">{{ booking.damage_fee|floatformat:2 }}</span></span>
+                </div>
+              {% else %}
+                <span class="damage-fee" style="display:none;">0</span>
+              {% endif %}
+              
+              <div class="fare-breakdown">
+                <div class="fare-item">
+                  <span class="fare-label">Total Amount</span>
+                  <span class="fare-value fare-total">₹<span class="total-with-damage">0.00</span></span>
+                </div>
+                
+                <div class="fare-item">
+                  <span class="fare-label">Pending Amount</span>
+                  <span class="fare-value">₹<span class="pending-payment">0.00</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Return Information -->
+            {% if booking.is_returned %}
+              <div class="booking-detail-item" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+                <span class="detail-label">Returned At</span>
+                <div class="datetime-display">
+                  <i class="fas fa-check-circle datetime-icon" style="color: #10b981;"></i>
+                  <span class="detail-value">{{ booking.returned_at }}</span>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-state-icon">🚗</div>
+      <h3 class="empty-state-title">No Bookings Yet</h3>
+      <p class="empty-state-description">
+        You haven't booked any cars yet. Start your journey by exploring our available vehicles.
+      </p>
+      <a href="{% url 'cars' %}" class="btn btn-primary">
+        <i class="fas fa-car"></i>
+        Browse Available Cars
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Calculate pending amounts dynamically including damage
+  document.querySelectorAll('.booking-card').forEach(card => {
+    const totalElem = card.querySelector('.total-amount');
+    const advanceElem = card.querySelector('.advance-payment');
+    const damageElem = card.querySelector('.damage-fee');
+    const pendingElem = card.querySelector('.pending-payment');
+    const totalWithDamageElem = card.querySelector('.total-with-damage');
+
+    let total = parseFloat(totalElem.textContent) || 0;
+    let advance = parseFloat(advanceElem.textContent) || 0;
+    let damage = parseFloat(damageElem?.textContent || 0);
+
+    let totalWithDamage = total + damage;
+    let pending = Math.max(totalWithDamage - advance, 0);
+
+    if (totalWithDamageElem) {
+      totalWithDamageElem.textContent = totalWithDamage.toFixed(2);
+    }
+    if (pendingElem) {
+      pendingElem.textContent = pending.toFixed(2);
+    }
+  });
+
+  // Add smooth animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+
+  // Observe booking cards for animation
+  document.querySelectorAll('.booking-card').forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(card);
+  });
+});
+</script>
+{% endblock %}

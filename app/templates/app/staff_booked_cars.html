@@ -1,0 +1,99 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Booked Cars - Staff{% endblock %}
+
+{% block content %}
+<br>
+<div class="container" style="padding:20px;">
+    <h2 style="color:#333;">Booked Cars (Staff Panel)</h2>
+    <p class="text-muted" style="color:#555;">Manage all bookings and handle returns</p>
+
+    {% if bookings %}
+        <div class="bookings-list">
+            {% for booking in bookings %}
+                <div style="border:1px solid #ccc; padding:20px; border-radius:8px; margin-bottom:20px; display:flex; align-items:flex-start; gap:20px; background-color:#f9f9f9;">
+                    
+                    <!-- Car Image -->
+                    <div>
+                        {% if booking.car.image %}
+                            <img src="{{ booking.car.image.url }}" 
+                                 alt="{{ booking.car.category }}" 
+                                 style="width:150px; height:auto; border-radius:8px;">
+                        {% else %}
+                            <span class="text-muted">No image</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div style="flex:1;">
+                        <h4 style="margin-top:0; color:#222;">{{ booking.car.category }} ({{ booking.car.ac_type }})</h4>
+                        <p><strong>Booking ID:</strong> #{{ booking.id }}</p>
+                        <p><strong>Customer:</strong> {{ booking.customer.username }}</p>
+                        <p><strong>Pickup → Drop:</strong> {{ booking.pickup_location }} → {{ booking.drop_location }}</p>
+                        <p><strong>Start:</strong> {{ booking.start_datetime }}</p>
+                        <p><strong>Expected Return:</strong> {{ booking.expected_return_datetime }}</p>
+                        <p><strong>Advance Paid:</strong> ₹{{ booking.advance_payment }}</p>
+                        <p><strong>Total Amount:</strong> ₹{{ booking.total_amount }}</p>
+
+                        <p>
+                            <strong>Status:</strong>
+                            {% if booking.is_returned %}
+                                <span style="color:green; font-weight:bold;">Returned</span>
+                                {% if booking.damage_reported %}
+                                    <br><span style="color:red;">Damage Fee: ₹{{ booking.damage_fee }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span style="color:orange; font-weight:bold;">Active</span>
+                                <br>Pending: ₹{{ booking.pending_payment }}
+                            {% endif %}
+                        </p>
+
+                        <!-- Actions -->
+                        <div>
+                            {% if not booking.is_returned %}
+                                <form action="{% url 'staff_returned_cars_mark' booking.id %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+
+                                    <!-- Damage Checkbox -->
+                                    <label style="display:block; margin-bottom:5px;">
+                                        <input type="checkbox" id="damage_check_{{ booking.id }}" name="damage_reported"
+                                               onchange="toggleDamageFee('{{ booking.id }}')">
+                                        Damage Reported
+                                    </label>
+
+                                    <!-- Damage Fee Field (hidden by default) -->
+                                    <div id="damage_fee_{{ booking.id }}" style="display:none; margin-bottom:10px;">
+                                        <label>Damage Fee (₹):</label>
+                                        <input type="number" name="damage_fee" min="0" value="0"
+                                               style="width:120px; padding:4px; border-radius:4px; border:1px solid #ccc;">
+                                    </div>
+
+                                    <!-- Submit -->
+                                    <button type="submit"
+                                            style="background-color:red; color:white; padding:6px 12px; border:none; border-radius:5px;">
+                                        Mark as Returned
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span style="color:gray;">Completed</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No bookings available.</p>
+    {% endif %}
+</div>
+
+<!-- JavaScript for toggling Damage Fee input -->
+<script>
+function toggleDamageFee(id) {
+  const box = document.getElementById(`damage_check_${id}`);
+  const field = document.getElementById(`damage_fee_${id}`);
+  field.style.display = box.checked ? "block" : "none";
+}
+</script>
+{% endblock %}

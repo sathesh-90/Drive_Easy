@@ -1,0 +1,954 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+/* ====== VARIABLES & RESET ====== */
+:root {
+  --primary: #2c3e50;
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --secondary: #64748b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --light: #f8fafc;
+  --dark: #2c3e50;
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  color: var(--dark);
+  background-color: #f1f5f9;
+}
+
+/* ====== LAYOUT & CONTAINER ====== */
+.booking-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.booking-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 968px) {
+  .booking-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* ====== TYPOGRAPHY ====== */
+.booking-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--dark);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.booking-subtitle {
+  text-align: center;
+  color: var(--secondary);
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-title::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+  border-radius: 2px;
+}
+
+/* ====== CARD COMPONENTS ====== */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  border: 1px solid var(--border);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--light);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--light);
+}
+
+/* ====== CAR DISPLAY CARD ====== */
+.car-image-container {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.car-image {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.car-image-container:hover .car-image {
+  transform: scale(1.03);
+}
+
+.car-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.car-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.car-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.car-price {
+  color: var(--primary);
+  font-size: 1.25rem;
+}
+
+.availability-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.availability-badge.available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.availability-badge.low {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.availability-badge.unavailable {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ====== FORM ELEMENTS ====== */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  color: var(--dark);
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-control, .form-select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: var(--transition);
+  background: white;
+}
+
+.form-control:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ====== DRIVE TYPE SELECTOR ====== */
+.drive-type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.drive-option {
+  position: relative;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  background: white;
+}
+
+.drive-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.drive-option.selected {
+  border-color: var(--primary);
+  background: #f0f7ff;
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.drive-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.drive-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.drive-description {
+  font-size: 0.875rem;
+  color: var(--secondary);
+}
+
+/* ====== DOCUMENT FIELDS ====== */
+.document-fields {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border: 1px dashed var(--border);
+  animation: slideDown 0.4s ease;
+}
+
+/* ====== FARE SUMMARY ====== */
+.fare-summary {
+  background: linear-gradient(135deg, #f0f9ff, #e0f7fa);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #bae6fd;
+}
+
+.fare-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.fare-item:last-child {
+  border-bottom: none;
+}
+
+.fare-label {
+  color: var(--secondary);
+}
+
+.fare-value {
+  font-weight: 600;
+}
+
+.fare-total {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.fare-breakdown {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+}
+
+/* ====== BUTTONS ====== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  width: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-loading {
+  position: relative;
+  color: transparent;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* ====== ANIMATIONS ====== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ====== VALIDATION STYLES ====== */
+.validation-message {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.validation-message.valid {
+  color: var(--success);
+}
+
+.validation-message.invalid {
+  color: var(--error);
+}
+
+.form-control.valid {
+  border-color: var(--success);
+}
+
+.form-control.invalid {
+  border-color: var(--error);
+}
+
+/* ====== DATE TIME INPUTS ====== */
+.datetime-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* ====== RESPONSIVE ADJUSTMENTS ====== */
+@media (max-width: 640px) {
+  .booking-title {
+    font-size: 1.75rem;
+  }
+  
+  .car-details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .drive-type-selector {
+    grid-template-columns: 1fr;
+  }
+  
+  .datetime-inputs {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ====== LOADING STATES ====== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+}
+
+.loading-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border);
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* ====== STEP INDICATOR ====== */
+.booking-steps {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.step.active .step-number {
+  background: var(--primary);
+  color: white;
+}
+
+.step-label {
+  font-size: 0.875rem;
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.step.active .step-label {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.step-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .booking-steps {
+    gap: 1rem;
+  }
+  
+  .step-label {
+    font-size: 0.75rem;
+  }
+}
+</style>
+
+<div class="booking-container">
+  <!-- Step Indicator -->
+  <div class="booking-steps">
+    <div class="step active">
+      <div class="step-number">1</div>
+      <div class="step-label">Car Selection</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step active">
+      <div class="step-number">2</div>
+      <div class="step-label">Booking Details</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-label">Confirmation</div>
+    </div>
+  </div>
+
+  <h1 class="booking-title">Book Your Premium Ride</h1>
+  <p class="booking-subtitle">Select your vehicle and customize your rental experience</p>
+
+  <div class="booking-grid">
+    <!-- Car Information Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="section-title">Vehicle Details</h2>
+      </div>
+      <div class="card-body">
+        <div class="car-image-container">
+          <img src="{{ car.image.url }}" alt="{{ car.category }}" class="car-image">
+          <div class="car-badge">{{ car.ac_type  }}</div>
+        </div>
+        
+        <h3>{{ car.category }} - {{ car.model_name }}</h3>
+        <p class="text-muted">{{ car.brand }}</p>
+        
+        <div class="car-details-grid">
+          <div class="car-detail-item">
+            <span class="detail-label">Hourly Rate</span>
+            <span class="detail-value car-price">₹<span id="per_hour">{{ car.price_per_hour }}</span></span>
+          </div>
+          <div class="car-detail-item">
+            <span class="detail-label">Per KM</span>
+            <span class="detail-value car-price">₹<span id="per_km">{{ car.price_per_km }}</span></span>
+          </div>
+          <div class="car-detail-item">
+            <span class="detail-label">Seating Capacity</span>
+            <span class="detail-value">5 Persons</span>
+          </div>
+          <div class="car-detail-item">
+            <span class="detail-label">Fuel Type</span>
+            <span class="detail-value">Petrol</span>
+          </div>
+        </div>
+        
+        <div class="availability-container" style="margin-top: 1.5rem;">
+          <span class="detail-label">Availability Status</span>
+          <div class="availability-badge {% if car.total_cars > 3 %}available{% elif car.total_cars > 0 %}low{% else %}unavailable{% endif %}">
+            <i class="fas fa-{% if car.total_cars > 3 %}check-circle{% elif car.total_cars > 0 %}exclamation-circle{% else %}times-circle{% endif %}"></i>
+            {{ car.total_cars }} car{{ car.total_cars|pluralize }} available
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Form Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="section-title">Booking Information</h2>
+      </div>
+      <form method="POST" class="card-body" id="bookingForm">
+        {% csrf_token %}
+        <input type="hidden" name="car_id" value="{{ car.id }}">
+
+        <!-- Drive Type Selection -->
+        <div class="form-group">
+          <label class="form-label">Drive Type</label>
+          <div class="drive-type-selector">
+            <label class="drive-option selected" for="self_drive">
+              <input type="radio" name="drive_type" id="self_drive" value="self_drive" checked>
+              <span class="drive-icon">🚗</span>
+              <span class="drive-title">Self Drive</span>
+              <span class="drive-description">Drive yourself</span>
+            </label>
+            <label class="drive-option" for="with_driver">
+              <input type="radio" name="drive_type" id="with_driver" value="with_driver">
+              <span class="drive-icon">👨‍💼</span>
+              <span class="drive-title">With Driver</span>
+              <span class="drive-description">Professional chauffeur</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Self Drive Documents (Conditional) -->
+        <div id="selfDriveFields" class="document-fields">
+          <div class="form-group">
+            <label class="form-label" for="aadhaar_number">Aadhaar Number</label>
+            <input type="text" name="aadhaar_number" id="aadhaar_number" pattern="[0-9]{12}" maxlength="12" 
+                   class="form-control" placeholder="Enter 12-digit Aadhaar number">
+            <div class="validation-message" id="aadhaarValidation"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="license_number">Driving License Number</label>
+            <input type="text" name="license_number" id="license_number" maxlength="20" 
+                   class="form-control" placeholder="Enter license number">
+            <div class="validation-message" id="licenseValidation"></div>
+          </div>
+        </div>
+
+        <!-- Location Details -->
+        <div class="form-group">
+          <label class="form-label" for="pickup_location">Pickup Location</label>
+          <input type="text" name="pickup_location" id="pickup_location" class="form-control" 
+                 placeholder="Enter pickup address" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="drop_location">Drop Location</label>
+          <input type="text" name="drop_location" id="drop_location" class="form-control" 
+                 placeholder="Enter drop address" required>
+        </div>
+
+        <!-- Date & Time -->
+        <div class="form-group">
+          <label class="form-label">Rental Period</label>
+          <div class="datetime-inputs">
+            <div>
+              <label class="form-label">Start Date & Time</label>
+              <input type="datetime-local" name="start_datetime" id="start_datetime" class="form-control" required>
+            </div>
+            <div>
+              <label class="form-label">End Date & Time</label>
+              <input type="datetime-local" name="expected_return_datetime" id="end_datetime" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Distance -->
+        <div class="form-group">
+          <label class="form-label" for="km_to_destination">Estimated Distance (KM)</label>
+          <input type="number" step="0.1" min="0" name="km_to_destination" id="km_to_destination" 
+                 class="form-control" placeholder="Enter approximate distance" required>
+        </div>
+
+        <!-- Fare Summary -->
+        <div class="fare-summary">
+          <h3 class="section-title">Fare Summary</h3>
+          
+          <div class="fare-item">
+            <span class="fare-label">Duration</span>
+            <span class="fare-value"><span id="calculated_hours">4</span> hours</span>
+          </div>
+          
+          <div class="fare-item">
+            <span class="fare-label">Base Amount</span>
+            <span class="fare-value">₹<span id="base_amount">0.00</span></span>
+          </div>
+          
+          <div class="fare-item">
+            <span class="fare-label">Driver Charge</span>
+            <span class="fare-value">₹<span id="driver_charge">0.00</span></span>
+          </div>
+          
+          <div class="fare-breakdown">
+            <div class="fare-item">
+              <span class="fare-label">Total Amount</span>
+              <span class="fare-value fare-total">₹<span id="total_amount">0.00</span></span>
+            </div>
+            
+            <div class="fare-item">
+              <span class="fare-label">Advance (20%)</span>
+              <span class="fare-value">₹<span id="advance_payment">0.00</span></span>
+            </div>
+            
+            <div class="fare-item">
+              <span class="fare-label">Payable at Return</span>
+              <span class="fare-value">₹<span id="pending_payment">0.00</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary mt-4" id="submitBtn">
+          <span class="btn-text">Confirm Booking</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <p>Processing your booking...</p>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // DOM Elements
+  const driveOptions = document.querySelectorAll('.drive-option');
+  const selfDriveFields = document.getElementById('selfDriveFields');
+  const driverInfo = document.getElementById('driverInfo');
+  const kmInput = document.getElementById('km_to_destination');
+  const startInput = document.getElementById('start_datetime');
+  const endInput = document.getElementById('end_datetime');
+  const bookingForm = document.getElementById('bookingForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const btnText = submitBtn.querySelector('.btn-text');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  
+  // Validation elements
+  const aadhaarInput = document.getElementById('aadhaar_number');
+  const licenseInput = document.getElementById('license_number');
+  const aadhaarValidation = document.getElementById('aadhaarValidation');
+  const licenseValidation = document.getElementById('licenseValidation');
+
+  // Pricing data
+  const perHour = parseFloat(document.getElementById('per_hour').textContent);
+  const perKm = parseFloat(document.getElementById('per_km').textContent);
+
+  // Fare display elements
+  const fareElements = {
+    hours: document.getElementById('calculated_hours'),
+    base: document.getElementById('base_amount'),
+    driver: document.getElementById('driver_charge'),
+    total: document.getElementById('total_amount'),
+    advance: document.getElementById('advance_payment'),
+    pending: document.getElementById('pending_payment')
+  };
+
+  // Initialize with current time as minimum
+  const now = new Date();
+  const timezoneOffset = now.getTimezoneOffset() * 60000;
+  const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
+  startInput.min = localISOTime;
+  endInput.min = localISOTime;
+
+  // Drive type selection
+  driveOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      driveOptions.forEach(opt => opt.classList.remove('selected'));
+      this.classList.add('selected');
+      const driveType = this.querySelector('input').value;
+      toggleDriveOptions(driveType);
+    });
+  });
+
+  function toggleDriveOptions(driveType) {
+    if (driveType === 'self_drive') {
+      selfDriveFields.style.display = 'block';
+      driverInfo.style.display = 'none';
+    } else {
+      selfDriveFields.style.display = 'none';
+      driverInfo.style.display = 'block';
+    }
+    calculateFare();
+  }
+
+  // Fare calculation
+  function calculateFare() {
+    let km = parseFloat(kmInput.value) || 0;
+    let hours = 4;
+
+    if (startInput.value && endInput.value) {
+      const start = new Date(startInput.value);
+      const end = new Date(endInput.value);
+      const diff = (end - start) / (1000 * 60 * 60);
+      hours = Math.max(Math.ceil(diff), 4);
+    }
+
+    const driveType = document.querySelector('.drive-option.selected input').value;
+    const baseAmount = Math.max(perHour * hours, perKm * km, perHour * 4);
+    const driverCharge = driveType === 'with_driver' ? 500 : 0;
+    const total = baseAmount + driverCharge;
+    const advance = total * 0.2;
+    const pending = total - advance;
+
+    // Update UI
+    fareElements.hours.textContent = hours;
+    fareElements.base.textContent = baseAmount.toFixed(2);
+    fareElements.driver.textContent = driverCharge.toFixed(2);
+    fareElements.total.textContent = total.toFixed(2);
+    fareElements.advance.textContent = advance.toFixed(2);
+    fareElements.pending.textContent = pending.toFixed(2);
+  }
+
+  // Validation functions
+  function validateAadhaar() {
+    const value = aadhaarInput.value.trim();
+    if (value.length === 0) {
+      resetValidation(aadhaarInput, aadhaarValidation);
+      return false;
+    }
+    
+    if (/^\d{12}$/.test(value)) {
+      setValid(aadhaarInput, aadhaarValidation, "Valid Aadhaar number");
+      return true;
+    } else {
+      setInvalid(aadhaarInput, aadhaarValidation, "Please enter a valid 12-digit Aadhaar number");
+      return false;
+    }
+  }
+
+  function validateLicense() {
+    const value = licenseInput.value.trim();
+    if (value.length === 0) {
+      resetValidation(licenseInput, licenseValidation);
+      return false;
+    }
+    
+    if (value.length >= 5) {
+      setValid(licenseInput, licenseValidation, "Valid license number");
+      return true;
+    } else {
+      setInvalid(licenseInput, licenseValidation, "License number must be at least 5 characters");
+      return false;
+    }
+  }
+
+  function setValid(input, validation, message) {
+    input.classList.remove('invalid');
+    input.classList.add('valid');
+    validation.textContent = message;
+    validation.className = 'validation-message valid';
+  }
+
+  function setInvalid(input, validation, message) {
+    input.classList.remove('valid');
+    input.classList.add('invalid');
+    validation.textContent = message;
+    validation.className = 'validation-message invalid';
+  }
+
+  function resetValidation(input, validation) {
+    input.classList.remove('valid', 'invalid');
+    validation.textContent = '';
+    validation.className = 'validation-message';
+  }
+
+  // Form submission
+  function handleFormSubmit(e) {
+    const driveType = document.querySelector('.drive-option.selected input').value;
+    
+    // If self drive, validate documents
+    if (driveType === 'self_drive') {
+      const isAadhaarValid = validateAadhaar();
+      const isLicenseValid = validateLicense();
+      
+      if (!isAadhaarValid || !isLicenseValid) {
+        e.preventDefault();
+        // Scroll to first invalid field
+        const firstInvalid = !isAadhaarValid ? aadhaarInput : licenseInput;
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstInvalid.focus();
+        return;
+      }
+    }
+    
+    // Show loading state
+    e.preventDefault();
+    submitBtn.disabled = true;
+    btnText.textContent = "Processing...";
+    submitBtn.classList.add('btn-loading');
+    loadingOverlay.classList.add('active');
+    
+    // Simulate processing delay
+    setTimeout(() => {
+      bookingForm.submit();
+    }, 2000);
+  }
+
+  // Event listeners
+  [kmInput, startInput, endInput].forEach(el => {
+    el.addEventListener('input', calculateFare);
+  });
+  
+  aadhaarInput.addEventListener('input', validateAadhaar);
+  licenseInput.addEventListener('input', validateLicense);
+  bookingForm.addEventListener('submit', handleFormSubmit);
+
+  // Initialize
+  toggleDriveOptions('self_drive');
+  calculateFare();
+});
+</script>
+{% endblock %}

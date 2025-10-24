@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
+  <link rel="stylesheet" href="{% static 'app/css/l_style.css' %}" />
+</head>
+<body style="background: url('{% static 'app/images/car_bg.png' %}') no-repeat center center/cover; min-height: 100vh;">
+  <div class="form-container">
+    <h2>Register</h2>
+    {% if messages %}
+      <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="text" name="username" placeholder="Username" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password1" placeholder="Password" required />
+      <input type="password" name="password2" placeholder="Confirm Password" required />
+      <button type="submit">Register</button>
+      <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </form>
+  </div>
+</body>
+</html>
+
+
