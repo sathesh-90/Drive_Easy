@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 Fast Distance Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            text-align: center;
+            color: #1565c0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 1.1em;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        .suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            display: block;
+            margin: 25px auto;
+            width: 300px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .method-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .method-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .method-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+            border-radius: 15px;
+            border-left: 5px solid #4caf50;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        .result.show {
+            display: block;
+        }
+        .result.error {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            border-left-color: #f44336;
+            color: #c62828;
+        }
+        .result h2 {
+            margin-top: 0;
+            color: #2e7d32;
+            text-align: center;
+        }
+        .result.error h2 {
+            color: #c62828;
+        }
+        .route-details, .fare-calculation {
+            background: rgba(255,255,255,0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .route-details h3, .fare-calculation h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 10px;
+        }
+        .route-details p, .fare-calculation p {
+            margin: 12px 0;
+            font-size: 16px;
+        }
+        .highlight {
+            color: #2e7d32;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .final-fare {
+            font-size: 24px;
+            color: #2e7d32;
+            font-weight: bold;
+            border-top: 3px solid #4caf50;
+            padding-top: 15px;
+            margin-top: 20px;
+            text-align: center;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .action-buttons {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .action-btn {
+            background: #ff9800;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .action-btn.book {
+            background: #4caf50;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .swap-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .swap-btn:hover {
+            background: #764ba2;
+            transform: translateY(-50%) rotate(180deg);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .method-info {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Fast Distance Calculator</h1>
+        
+        <div class="status" id="status">
+            ✅ Ready! Enter your locations and click Calculate.
+        </div>
+
+        <div class="method-selector">
+            <button class="method-btn active" data-method="free" id="freeBtn">🆓 Free Mode</button>
+            <button class="method-btn" data-method="google" id="googleBtn">🗺️ Google Maps</button>
+        </div>
+        <div class="method-info" id="methodInfo">
+            Using free OpenStreetMap service (no API key required)
+        </div>
+        
+        <form id="distanceForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="origin">🚩 From (Pickup Location):</label>
+                <input type="text" id="origin" name="origin" value="Tirupati, Andhra Pradesh" placeholder="Enter pickup location" required>
+                <div id="originSuggestions" class="suggestions"></div>
+            </div>
+            
+            <div class="form-group" style="position: relative;">
+                <label for="destination">🏁 To (Drop Location):</label>
+                <input type="text" id="destination" name="destination" value="Chennai, Tamil Nadu" placeholder="Enter destination" required>
+                <div id="destinationSuggestions" class="suggestions"></div>
+                <button type="button" class="swap-btn" id="swapBtn" title="Swap locations">⇅</button>
+            </div>
+            
+            <button type="submit" class="btn" id="calcBtn">
+                🚀 Calculate Distance NOW
+            </button>
+        </form>
+        
+        <div class="result" id="result">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        let currentMethod = 'free';
+        let debounceTimer = null;
+        let originCoords = null;
+        let destinationCoords = null;
+
+        // Method selector
+        document.querySelectorAll('.method-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentMethod = this.dataset.method;
+                
+                const methodInfo = document.getElementById('methodInfo');
+                if (currentMethod === 'free') {
+                    methodInfo.textContent = 'Using free OpenStreetMap service (no API key required)';
+                } else {
+                    methodInfo.textContent = 'Using Google Maps API (requires API key and billing)';
+                }
+            });
+        });
+
+        // Haversine formula for distance calculation
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in kilometers
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Search locations using Nominatim
+        async function searchLocation(query) {
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
+                );
+                return await response.json();
+            } catch (error) {
+                console.error('Location search error:', error);
+                return [];
+            }
+        }
+
+        // Show location suggestions
+        async function showSuggestions(input, suggestionsDiv) {
+            const query = input.value.trim();
+            
+            if (query.length < 3 || currentMethod !== 'free') {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                const results = await searchLocation(query);
+                
+                suggestionsDiv.innerHTML = '';
+                
+                if (results.length > 0) {
+                    results.forEach(result => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.textContent = result.display_name;
+                        div.onclick = () => {
+                            input.value = result.display_name;
+                            if (input.id === 'origin') {
+                                originCoords = { lat: parseFloat(result.lat), lon: parseFloat(result.lon) };
+                            } else {
+                                destinationCoords = { lat: parseFloat(result.lat), lon: parseFloat(result.lon) };
+                            }
+                            suggestionsDiv.style.display = 'none';
+                        };
+                        suggestionsDiv.appendChild(div);
+                    });
+                    suggestionsDiv.style.display = 'block';
+                } else {
+                    suggestionsDiv.style.display = 'none';
+                }
+            }, 300);
+        }
+
+        // Event listeners for suggestions
+        document.getElementById('origin').addEventListener('input', (e) => {
+            originCoords = null;
+            showSuggestions(e.target, document.getElementById('originSuggestions'));
+        });
+
+        document.getElementById('destination').addEventListener('input', (e) => {
+            destinationCoords = null;
+            showSuggestions(e.target, document.getElementById('destinationSuggestions'));
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.form-group')) {
+                document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none');
+            }
+        });
+
+        // Swap locations
+        document.getElementById('swapBtn').addEventListener('click', () => {
+            const originInput = document.getElementById('origin');
+            const destinationInput = document.getElementById('destination');
+            
+            const tempValue = originInput.value;
+            const tempCoords = originCoords;
+            
+            originInput.value = destinationInput.value;
+            destinationInput.value = tempValue;
+            
+            originCoords = destinationCoords;
+            destinationCoords = tempCoords;
+            
+            document.getElementById('result').classList.remove('show');
+        });
+
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = message;
+        }
+
+        function showResult(message, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message;
+            resultDiv.classList.add('show');
+            if (isError) {
+                resultDiv.classList.add('error');
+            } else {
+                resultDiv.classList.remove('error');
+            }
+        }
+
+        // Free mode calculation
+        async function calculateFreeDistance(origin, destination) {
+            try {
+                // Get coordinates if not cached
+                if (!originCoords) {
+                    const originResults = await searchLocation(origin);
+                    if (originResults.length > 0) {
+                        originCoords = { lat: parseFloat(originResults[0].lat), lon: parseFloat(originResults[0].lon) };
+                    }
+                }
+                
+                if (!destinationCoords) {
+                    const destResults = await searchLocation(destination);
+                    if (destResults.length > 0) {
+                        destinationCoords = { lat: parseFloat(destResults[0].lat), lon: parseFloat(destResults[0].lon) };
+                    }
+                }
+                
+                if (!originCoords || !destinationCoords) {
+                    throw new Error('Could not find one or both locations. Please check the spelling.');
+                }
+                
+                // Calculate distance
+                const distance = calculateDistance(
+                    originCoords.lat, originCoords.lon,
+                    destinationCoords.lat, destinationCoords.lon
+                );
+                
+                const distanceKm = distance.toFixed(2);
+                const distanceMiles = (distance * 0.621371).toFixed(2);
+                const estimatedHours = Math.ceil(distance / 60); // Rough estimate: 60km/h average
+                
+                // Calculate fare
+                const farePerKm = 12.50;
+                const farePerHour = 200;
+                const distanceFare = distance * farePerKm;
+                const timeFare = estimatedHours * farePerHour;
+                const estimatedFare = Math.max(distanceFare, timeFare);
+                
+                return {
+                    success: true,
+                    distance: `${distanceKm} km`,
+                    duration: `${estimatedHours} hour(s)`,
+                    distance_km: parseFloat(distanceKm),
+                    duration_hours: estimatedHours,
+                    distance_fare: distanceFare.toFixed(2),
+                    time_fare: timeFare.toFixed(2),
+                    estimated_fare: estimatedFare.toFixed(2),
+                    origin: origin,
+                    destination: destination
+                };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('distanceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('calcBtn');
+            const origin = document.getElementById('origin').value.trim();
+            const destination = document.getElementById('destination').value.trim();
+
+            if (!origin || !destination) {
+                showResult('<h2>❌ Error</h2><p>Please enter both pickup and destination locations!</p>', true);
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div>🔥 Calculating...';
+            updateStatus('🔥 Calculating distance and fare...');
+            document.getElementById('result').classList.remove('show');
+
+            try {
+                let data;
+                
+                if (currentMethod === 'free') {
+                    // Use free calculation
+                    data = await calculateFreeDistance(origin, destination);
+                } else {
+                    // Use Django backend (Google Maps)
+                    const formData = new FormData(this);
+                    const response = await fetch('/calculate-distance/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    });
+                    data = await response.json();
+                }
+                
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Calculate Distance NOW';
+                
+                if (data.success) {
+                    updateStatus('✅ Distance calculated successfully!');
+                    
+                    const methodNote = currentMethod === 'free' 
+                        ? '<small style="color: #666;">📍 Calculated using straight-line distance</small>'
+                        : '<small style="color: #666;">🗺️ Calculated using Google Maps routing</small>';
+                    
+                    showResult(`
+                        <h2>🎯 Distance Calculated!</h2>
+                        ${methodNote}
+                        <div class="route-details">
+                            <h3>🗺️ Route Details</h3>
+                            <p><strong>From:</strong> ${data.origin}</p>
+                            <p><strong>To:</strong> ${data.destination}</p>
+                            <p><strong>🛣️ Distance:</strong> <span class="highlight">${data.distance}</span></p>
+                            <p><strong>⏱️ Duration:</strong> <span class="highlight">${data.duration}</span></p>
+                        </div>
+                        <div class="fare-calculation">
+                            <h3>💰 Fare Calculation</h3>
+                            <p><strong>Distance-based fare:</strong> ₹${data.distance_fare} (₹12.50/km)</p>
+                            <p><strong>Time-based fare:</strong> ₹${data.time_fare} (₹200/hour)</p>
+                            <div class="final-fare">
+                                💳 <strong>Estimated Fare: ₹${data.estimated_fare}</strong>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="newCalculation()" class="action-btn">
+                                🔄 New Calculation
+                            </button>
+                            <button onclick="bookNow('${data.origin}', '${data.destination}', '${data.estimated_fare}')" class="action-btn book">
+                                🚗 Book This Trip
+                            </button>
+                        </div>
+                    `, false);
+                } else {
+                    updateStatus('❌ Error occurred!');
+                    let errorMsg = data.error;
+                    
+                    // If Google Maps fails, suggest free mode
+                    if (currentMethod === 'google' && (errorMsg.includes('API') || errorMsg.includes('denied') || errorMsg.includes('quota'))) {
+                        errorMsg += `<br><br>💡 <strong>Try switching to Free Mode above for instant calculation without API limits!</strong>`;
+                    }
+                    
+                    showResult(`
+                        <h2>❌ Error</h2>
+                        <p>${errorMsg}</p>
+                    `, true);
+                }
+            } catch (error) {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Calculate Distance NOW';
+                updateStatus('❌ Network error occurred!');
+                
+                let errorMsg = `An error occurred while calculating the distance. Please try again.<br><strong>Details:</strong> ${error.message}`;
+                
+                if (currentMethod === 'google') {
+                    errorMsg += `<br><br>💡 <strong>Try switching to Free Mode above for instant calculation without API requirements!</strong>`;
+                }
+                
+                showResult(`
+                    <h2>❌ Network Error</h2>
+                    <p>${errorMsg}</p>
+                `, true);
+                console.error('Error:', error);
+            }
+        });
+
+        function newCalculation() {
+            document.getElementById('result').classList.remove('show');
+            updateStatus('✅ Ready for new calculation...');
+            document.getElementById('origin').focus();
+            document.getElementById('origin').select();
+        }
+
+        function bookNow(origin, destination, fare) {
+            const bookingUrl = `/booking/?pickup=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&fare=${fare}`;
+            if (confirm(`Book this trip for ₹${fare}?\n\nFrom: ${origin}\nTo: ${destination}`)) {
+                window.location.href = bookingUrl;
+            }
+        }
+
+        // Auto-focus on first input when page loads
+        window.addEventListener('load', function() {
+            document.getElementById('origin').focus();
+        });
+    </script>
+</body>
+</html>

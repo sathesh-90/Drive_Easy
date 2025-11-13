@@ -1,0 +1,539 @@
+{% extends 'app/base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+/* ====== VARIABLES & RESET ====== */
+:root {
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+   --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #27ae60;
+}
+
+.admin-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ====== TYPOGRAPHY ====== */
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dashboard-subtitle {
+  color: var(--secondary);
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-title::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+  border-radius: 2px;
+}
+
+/* ====== STATS GRID ====== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-card.success::before {
+  background: linear-gradient(90deg, var(--success), #059669);
+}
+
+.stat-card.warning::before {
+  background: linear-gradient(90deg, var(--warning), #d97706);
+}
+
+.stat-card.error::before {
+  background: linear-gradient(90deg, var(--error), #dc2626);
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stat-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-icon.primary {
+  background: linear-gradient(135deg, #dbeafe, #93c5fd);
+  color: var(--primary);
+}
+
+.stat-icon.success {
+  background: linear-gradient(135deg, #dcfce7, #86efac);
+  color: var(--success);
+}
+
+.stat-icon.warning {
+  background: linear-gradient(135deg, #fef3c7, #fcd34d);
+  color: var(--warning);
+}
+
+.stat-icon.error {
+  background: linear-gradient(135deg, #fee2e2, #fca5a5);
+  color: var(--error);
+}
+
+.stat-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 0.5rem;
+}
+
+.stat-change {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.change-positive {
+  color: var(--success);
+}
+
+.change-negative {
+  color: var(--error);
+}
+
+/* ====== CHARTS SECTION ====== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-container {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.chart-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ====== RECENT ACTIVITY ====== */
+.activity-section {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.activity-item:hover {
+  background: var(--light);
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.activity-icon.booking {
+  background: #dbeafe;
+  color: var(--primary);
+}
+
+.activity-icon.return {
+  background: #dcfce7;
+  color: var(--success);
+}
+
+.activity-icon.payment {
+  background: #fef3c7;
+  color: var(--warning);
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-title {
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 0.25rem;
+}
+
+.activity-time {
+  font-size: 0.875rem;
+  color: var(--secondary);
+}
+
+.activity-amount {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+/* ====== QUICK ACTIONS ====== */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--dark);
+  transition: var(--transition);
+  text-align: center;
+}
+
+.action-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  color: var(--primary);
+}
+
+.action-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: var(--light);
+  transition: var(--transition);
+}
+
+.action-btn:hover .action-icon {
+  background: var(--primary);
+  color: white;
+}
+
+.action-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ====== CHART STYLING ====== */
+.chart-wrapper {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* ====== LOADING STATES ====== */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top: 2px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 1rem;
+  }
+  
+  .dashboard-title {
+    font-size: 2rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .charts-grid {
+    gap: 1rem;
+  }
+  
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-value {
+    font-size: 1.75rem;
+  }
+}
+
+/* ====== FILTER CONTROLS ====== */
+.filter-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.875rem;
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.filter-btn:hover:not(.active) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+</style>
+
+<div class="admin-dashboard">
+  <h1 class="dashboard-title">Admin Dashboard</h1>
+  <p class="dashboard-subtitle">Comprehensive overview of your car rental business</p>
+
+  <!-- Date Range Filter -->
+  <div class="filter-controls">
+    <button class="filter-btn active" data-range="7">Last 7 Days</button>
+    <button class="filter-btn" data-range="30">Last 30 Days</button>
+    <button class="filter-btn" data-range="90">Last 90 Days</button>
+    <button class="filter-btn" data-range="365">Last Year</button>
+  </div>
+
+  <!-- Statistics Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <h3 class="stat-title">Total Bookings</h3>
+        <div class="stat-icon primary">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+      </div>
+      <div class="stat-value" id="total-bookings">{{ total_bookings }}</div>
+      <div class="stat-change change-positive" id="booking-change">
+        <i class="fas fa-arrow-up"></i>
+        <span>12% increase</span>
+      </div>
+    </div>
+
+    <div class="stat-card success">
+      <div class="stat-header">
+        <h3 class="stat-title">Total Revenue</h3>
+        <div class="stat-icon success">
+          <i class="fas fa-rupee-sign"></i>
+        </div>
+      </div>
+      <div class="stat-value" id="total-revenue">₹{{ total_revenue }}</div>
+      <div class="stat-change change-positive" id="revenue-change">
+        <i class="fas fa-arrow-up"></i>
+        <span>8% increase</span>
+      </div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-header">
+        <h3 class="stat-title">Active Drivers</h3>
+        <div class="stat-icon warning">
+          <i class="fas fa-user-tie"></i>
+        </div>
+      </div>
+      <div class="stat-value" id="total-drivers">{{ total_drivers }}</div>
+      <div class="stat-change change-positive">
+        <i class="fas fa-arrow-up"></i>
+        <span>{{ total_drivers }} active</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <h3 class="stat-title">Fleet Count</h3>
+        <div class="stat-icon primary">
+          <i class="fas fa-car"></i>
+        </div>
+      </div>
+      <div class="stat-value" id="total-cars">{{ total_cars }}</div>
+      <div class="stat-change change-positive">
+        <i class="fas fa-arrow-up"></i>
+        <span>{{ total_cars }} vehicles</span>
+      </div>
+    </div>
+
+    <div class="stat-card success">
+      <div class="stat-header">
+        <h3 class="stat-title">Returned Cars</h3>
+        <div class="stat-icon success">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+      <div class="stat-value" id="returned-cars">{{ returned_cars }}</div>
+      <div class="stat-change change-positive">
+        <i class="fas fa-arrow-up"></i>
+        <span>{{ returned_cars }} completed</span>
+      </div>
+    </div>
+
+    <div class="stat-card error">
+      <div class="stat-header">
+        <h3 class="stat-title">Pending Bookings</h3>
+        <div class="stat-icon error">
+          <i class="fas fa-clock"></i>
+        </div>
+      </div>
+      <div class="stat-value" id="pending-bookings">{{ pending_bookings }}</div>
+      <div class="stat-change change-negative">
+        <i class="fas fa-arrow-down"></i>
+        <span>{{ pending_bookings }} ongoing</span>
+      </div>
+    </div>
+  </div>
+</script>
+{% endblock %}

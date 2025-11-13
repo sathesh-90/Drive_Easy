@@ -1,0 +1,102 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: url('/static/app/images/car_bg.png') no-repeat center center/cover;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Reduce blur and dark overlay for better visibility */
+    backdrop-filter: blur(2px); 
+    background-color: rgba(0, 0, 0, 0.05); 
+    z-index: -1;
+  }
+  
+  .form-container {
+    background: rgba(255, 255, 255, 0.25); /* slightly more visible form */
+    padding: 30px 40px;
+    border-radius: 15px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    width: 320px;
+    color: white;
+  }
+  
+  .form-container h2 {
+    margin-bottom: 20px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+  }
+  
+  input::placeholder {
+    color: #f0f0f0;
+  }
+  
+  button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: #6c5ce7;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #341f97;
+  }
+  
+  p {
+    margin-top: 15px;
+  }
+  
+  a {
+    color: #f1c40f;
+    text-decoration: none;
+  }
+
+  
+  
+
+  
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #fff;
+  }
+  
+  .checkbox-container input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #6c5ce7;
+    width: 16px;
+    height: 16px;
+    transform: scale(1.1);
+
+
+  }
+  

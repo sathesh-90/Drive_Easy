@@ -1,0 +1,175 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Drivers{% endblock %}
+
+{% block content %}
+<h2>Drivers List</h2>
+
+<!-- Search -->
+<div style="text-align:center; margin:15px 0;">
+    <input id="searchInput" type="text" placeholder="Search drivers by name..." style="padding:8px; width:320px; border-radius:6px; border:1px solid #ccc;">
+</div>
+
+{% if drivers %}
+    <div id="driversContainer">
+        {% for driver in drivers %}
+            <div class="driver-card">
+                <div class="driver-header">
+                    <div>
+                        <h3 class="driver-name">{{ driver.name }}</h3>
+
+                        {# Status / Availability line: checks common fields safely #}
+                        <div class="driver-status-line">
+                            {% if driver.is_on_leave %}
+                                <span class="status-badge status-leave">On Leave</span>
+                            {% elif driver.available %}
+                                <span class="status-badge status-available">Available</span>
+                            {% elif driver.assigned_car %}
+                                <span class="status-badge status-assigned">Assigned</span>
+                            {% elif driver.status %}
+                                <span class="status-badge status-info">{{ driver.status }}</span>
+                            {% else %}
+                                <span class="status-badge status-unknown">Unknown</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <button class="toggle-btn" type="button">Details</button>
+                </div>
+
+                {% if driver.image %}
+                    <img src="{{ driver.image.url }}" width="150" height="150" alt="{{ driver.name }}">
+                {% else %}
+                    <img src="{% static 'app/images/default_driver.png' %}" width="150" height="150" alt="{{ driver.name }}">
+                {% endif %}
+
+                <div class="driver-details" style="display:block;">
+                    <p><strong>License Number:</strong> {{ driver.license_number }}</p>
+                    <p><strong>Aadhar Number:</strong> {{ driver.aadhar_number }}</p>
+                    <p><strong>Phone:</strong> {{ driver.phone }}</p>
+                    {% if driver.assigned_car %}
+                        <p><strong>Assigned Car:</strong> {{ driver.assigned_car }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No drivers available.</p>
+{% endif %}
+
+<div class="back-btn-container">
+    <a href="{% url 'index' %}" class="back-btn">← Dashboard</a>
+</div>
+
+<style>
+/* Container and cards */
+#driversContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+.driver-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 15px;
+    width: 300px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: transform 0.18s;
+    background: #fff;
+}
+.driver-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Driver header */
+.driver-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.toggle-btn {
+    padding: 6px 10px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.toggle-btn:hover { background-color: #1e40af; }
+
+/* Status badges */
+.driver-status-line { margin-top: 6px; }
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: #fff;
+    margin-right: 6px;
+}
+.status-available { background:#10b981; }    /* green */
+.status-leave { background:#f97316; }        /* orange */
+.status-assigned { background:#ef4444; }     /* red */
+.status-info { background:#3b82f6; }         /* blue */
+.status-unknown { background:#6b7280; }      /* gray */
+
+/* Details */
+.driver-details { margin-top: 10px; font-size: 14px; color:#111827; }
+
+/* Image layout */
+.driver-card img {
+    width: 150px;
+    height: 150px;
+    display: block;
+    margin: 10px auto;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+/* Back button */
+.back-btn {
+    margin-top: 20px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    background-color: #f59e0b;
+    transition: background-color 0.15s;
+}
+.back-btn:hover { background-color: #d97706; }
+.back-btn-container { display:flex; justify-content:center; margin-top:18px; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Toggle driver details safely
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const card = btn.closest('.driver-card');
+            if (!card) return;
+            const details = card.querySelector('.driver-details');
+            if (!details) return;
+            details.style.display = (details.style.display === 'none' || details.style.display === '') ? 'block' : 'none';
+        });
+    });
+
+    // Search filter with guards
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.trim().toLowerCase();
+            document.querySelectorAll('.driver-card').forEach(card => {
+                const nameEl = card.querySelector('.driver-name');
+                const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+                card.style.display = name.includes(filter) ? 'block' : 'none';
+            });
+        });
+    }
+});
+</script>
+
+{% endblock %}

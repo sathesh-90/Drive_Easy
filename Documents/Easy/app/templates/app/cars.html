@@ -1,0 +1,51 @@
+{% extends "app/base.html" %}
+
+{% block title %}Cars - DriveEasy{% endblock %}
+
+{% block content %}
+<!-- Featured Cars -->
+<section id="cars" class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Our Fleet</h2>
+            <p>Explore our collection of vehicles suitable for any occasion</p>
+        </div>
+        <div class="cars-grid">
+            {% for car in cars %}
+            <div class="car-card">
+                <div class="car-img">
+                    <img src="{{ car.image.url }}" alt="{{ car.category }} {{ car.ac_type }}">
+                </div>
+                <div class="car-info">
+                    <h3>{{ car.category }} {{ car.ac_type }}</h3>
+                    <div class="car-specs">
+                        <div class="car-spec"><i class="fas fa-car"></i> {{ car.category }}</div>
+                        <div class="car-spec"><i class="fas fa-users"></i> 5 Seats</div>
+                        <div class="car-spec"><i class="fas fa-snowflake"></i> {{ car.ac_type }}</div>
+                        <div class="car-spec"><i class="fas fa-gas-pump"></i> {{ car.fuel_consumption|title }}</div>
+                        <div class="car-spec">
+    {% if car.total_cars > 0 %}
+        <i class="fas fa-layer-group"></i> {{ car.total_cars }} Available
+    {% else %}
+        <i class="fas fa-times-circle text-danger"></i> Not Available
+    {% endif %}
+</div>
+                    </div>
+                   
+<div class="car-price">
+    <div class="price">₹{{ car.price }} <span>/day</span></div>
+    {% if car.total_cars > 0 %}
+        <a href="{% url 'booking' %}?car_id={{ car.id }}" class="btn rent-btn">Rent Now</a>
+    {% else %}
+        <button class="btn rent-btn" disabled>Not Available</button>
+    {% endif %}
+</div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No cars available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
