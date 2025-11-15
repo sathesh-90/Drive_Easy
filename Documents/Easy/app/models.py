@@ -65,7 +65,7 @@ class Customer(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name="customer_profile"
-        # Remove null=True, blank=True
+       
     )
     phone = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
@@ -75,7 +75,7 @@ class Customer(models.Model):
     def __str__(self):
         return self.user.username
 
-from django.contrib.auth.models import User  # or your CustomUser if you have one
+from django.contrib.auth.models import User 
 from decimal import Decimal
 
 class Booking(models.Model):
@@ -96,8 +96,8 @@ class Booking(models.Model):
     distance_km = models.FloatField(null=True, blank=True)
     is_returned = models.BooleanField(default=False)
     returned_at = models.DateTimeField(null=True, blank=True)
-    damage_fee = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
     damage_reported = models.BooleanField(default=False)
+    damage_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     kms_to_destination = models.PositiveIntegerField(default=0)
     hours_used = models.IntegerField(default=4)
     DRIVE_CHOICES = [
@@ -134,12 +134,3 @@ class Booking(models.Model):
                 return self.distance_km
         return None
 
-class Maintenance(models.Model):
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
-    date = models.DateField()
-    description = models.TextField()
-    cost = models.DecimalField(max_digits=7, decimal_places=2)
-
-    def __str__(self):
-        return f"{self.car} - {self.date}"
-    

@@ -14928,3 +14928,485 @@ Not Found: /favicon.ico
 "GET /about/ HTTP/1.1" 200 10407
 "GET /cars/ HTTP/1.1" 200 13394
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 6020
+"GET /static/app/css/style.css HTTP/1.1" 304 0
+"GET /static/app/css/h_style.css HTTP/1.1" 304 0
+"GET /static/app/js/h.js HTTP/1.1" 304 0
+"GET /static/app/js/script.js HTTP/1.1" 304 0
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 6131
+"GET /cars/ HTTP/1.1" 200 13403
+"GET /media/cars/TOP_KiwiAv3.jpg HTTP/1.1" 304 0
+"GET /media/cars/Tata_sumo_vadHLhl.jpg HTTP/1.1" 304 0
+"GET /media/cars/Ambassador_non_ac_kOv0odL.jpg HTTP/1.1" 304 0
+"GET /media/cars/MAruthi_omni_ff84rMm.jpg HTTP/1.1" 304 0
+"GET /media/cars/tata_sumo_sumo_non_5ANygVx.jpg HTTP/1.1" 304 0
+"GET /media/cars/car1_WkAU0xl.jpg HTTP/1.1" 304 0
+"GET /media/cars/mahindra_amedra_yMP9Lgp.jpeg HTTP/1.1" 304 0
+"GET /about/ HTTP/1.1" 200 10416
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"GET /static/app/css/l_style.css HTTP/1.1" 304 0
+"GET /static/app/images/car_bg.png HTTP/1.1" 304 0
+"GET /register/ HTTP/1.1" 200 1062
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 6020
+"GET /cars/ HTTP/1.1" 200 13403
+"GET /booked-cars/ HTTP/1.1" 200 24749
+"GET / HTTP/1.1" 200 6020
+"GET /cars/ HTTP/1.1" 200 13403
+"GET / HTTP/1.1" 200 6020
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 3702
+"POST /admin/login/?next=/admin/ HTTP/1.1" 200 3867
+"POST /admin/login/?next=/admin/ HTTP/1.1" 200 3867
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 4528
+"GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 4528
+Watching for file changes with StatReloader
+"POST /admin/logout/ HTTP/1.1" 200 3576
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 4181
+"POST /admin/login/?next=/admin/ HTTP/1.1" 200 4342
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 7416
+"GET /admin/auth/user/ HTTP/1.1" 200 13816
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/auth/user/6/change/ HTTP/1.1" 200 22445
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"POST /admin/auth/user/6/change/ HTTP/1.1" 302 0
+"GET /admin/auth/user/ HTTP/1.1" 200 14009
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/auth/user/6/change/ HTTP/1.1" 200 22841
+"GET /admin/auth/user/ HTTP/1.1" 200 13816
+"POST /admin/logout/ HTTP/1.1" 200 3576
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 4181
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 4528
+"GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 4528
+Forbidden (Permission denied): /admin/auth/user/
+Traceback (most recent call last):
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/contrib/admin/options.py", line 688, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/utils/decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/views/decorators/cache.py", line 62, in _wrapper_view_func
+    response = view_func(request, *args, **kwargs)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/contrib/admin/sites.py", line 242, in inner
+    return view(request, *args, **kwargs)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/utils/decorators.py", line 46, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/utils/decorators.py", line 134, in _wrapper_view
+    response = view_func(request, *args, **kwargs)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/contrib/admin/options.py", line 1923, in changelist_view
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+"GET /admin/auth/user/ HTTP/1.1" 403 135
+"GET /admin/ HTTP/1.1" 200 4528
+"POST /admin/logout/ HTTP/1.1" 200 3576
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 4181
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 7729
+"GET /admin/auth/user/ HTTP/1.1" 200 13816
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/auth/user/4/change/ HTTP/1.1" 200 22442
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"POST /admin/auth/user/4/change/ HTTP/1.1" 302 0
+"GET /admin/auth/user/ HTTP/1.1" 200 14010
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"POST /admin/logout/ HTTP/1.1" 200 3576
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 4181
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 6612
+"POST /admin/logout/ HTTP/1.1" 200 3576
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 4181
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 8010
+"GET / HTTP/1.1" 200 6003
+"GET /admin-dashboard/ HTTP/1.1" 200 16587
+"GET /staff/returned_cars/ HTTP/1.1" 200 19990
+"GET /admin-dashboard/ HTTP/1.1" 200 16587
+"GET /drivers/ HTTP/1.1" 200 13259
+"GET /media/drivers/WhatsApp_Image_2025-10-24_at_2.28.16_PM_GO5xmp9.jpeg HTTP/1.1" 304 0
+"GET /media/drivers/WhatsApp_Image_2025-10-24_at_2.25.46_PM_Sr8u2Vv.jpeg HTTP/1.1" 304 0
+"GET /media/drivers/WhatsApp_Image_2025-10-24_at_2.28.16_PM_1_1wAL7Xd.jpeg HTTP/1.1" 304 0
+"GET /media/drivers/WhatsApp_Image_2025-10-24_at_2.26.20_PM.jpeg HTTP/1.1" 304 0
+"GET /staff/returned_cars/ HTTP/1.1" 200 19990
+"GET /drivers/ HTTP/1.1" 200 13259
+"GET /staff/booked_cars/ HTTP/1.1" 200 9570
+"GET /drivers/ HTTP/1.1" 200 13259
+"GET /staff/booked_cars/ HTTP/1.1" 200 9570
+"GET /cars/ HTTP/1.1" 200 13386
+"GET /booking/?car_id=6 HTTP/1.1" 200 29877
+"POST /booking/?car_id=6 HTTP/1.1" 302 0
+"GET /booked-cars/ HTTP/1.1" 200 25211
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 6020
+"GET /cars/ HTTP/1.1" 200 13402
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"GET /password_reset/ HTTP/1.1" 200 5752
+"POST /password_reset/ HTTP/1.1" 302 0
+Internal Server Error: /password_reset_done/
+Traceback (most recent call last):
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/base.py", line 175, in render
+    return self._render(context)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/base.py", line 167, in _render
+    return self.nodelist.render(context)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/base.py", line 1005, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/base.py", line 966, in render_annotated
+    return self.render(context)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/loader_tags.py", line 132, in render
+    compiled_parent = self.get_parent(context)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/loader_tags.py", line 129, in get_parent
+    return self.find_template(parent, context)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/loader_tags.py", line 107, in find_template
+    template, origin = context.template.engine.find_template(
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/engine.py", line 161, in find_template
+    raise TemplateDoesNotExist(name, tried=tried)
+django.template.exceptions.TemplateDoesNotExist: base.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/backends/django.py", line 63, in render
+    reraise(exc, self.backend)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/template/backends/django.py", line 84, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: base.html
+"GET /password_reset_done/ HTTP/1.1" 500 127282
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"GET /cars/ HTTP/1.1" 200 13046
+"GET / HTTP/1.1" 200 5664
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 5664
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 6131
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 6020
+"GET /cars/ HTTP/1.1" 200 13402
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 6054
+"GET /staff/returned_cars/ HTTP/1.1" 200 19976
+"GET /staff/booked_cars/ HTTP/1.1" 200 13043
+"POST /staff/returned_cars/mark/2/ HTTP/1.1" 302 0
+"GET /staff/returned_cars/ HTTP/1.1" 200 24225
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /staff/returned_cars/ HTTP/1.1" 200 24225
+"GET /staff/booked_cars/ HTTP/1.1" 200 9613
+"POST /staff/returned_cars/mark/3/ HTTP/1.1" 302 0
+"GET /staff/returned_cars/ HTTP/1.1" 200 28490
+"GET /booked-cars/ HTTP/1.1" 200 15947
+"GET /cars/ HTTP/1.1" 200 13437
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"GET /password_reset/ HTTP/1.1" 200 5752
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+"GET /password_reset/ HTTP/1.1" 200 5752
+"POST /password_reset/ HTTP/1.1" 302 0
+"GET /password_reset_done/ HTTP/1.1" 200 5361
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 5664
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 6131
+"GET /register/ HTTP/1.1" 200 1062
+"POST /register/ HTTP/1.1" 200 1151
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"GET /register/ HTTP/1.1" 200 1062
+"POST /register/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 6024
+"GET / HTTP/1.1" 200 6024
+"GET /cars/ HTTP/1.1" 200 13407
+"GET /booking/?car_id=1 HTTP/1.1" 200 29909
+"POST /booking/?car_id=1 HTTP/1.1" 302 0
+"GET /booked-cars/ HTTP/1.1" 200 20106
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 6054
+"GET /booked-cars/ HTTP/1.1" 200 20050
+"GET /staff/booked_cars/ HTTP/1.1" 200 9617
+"POST /staff/returned_cars/mark/4/ HTTP/1.1" 302 0
+"GET /staff/returned_cars/ HTTP/1.1" 200 32771
+"GET /about/ HTTP/1.1" 200 10450
+"GET /cars/ HTTP/1.1" 200 13437
+"GET / HTTP/1.1" 200 6054
+"GET /booked-cars/ HTTP/1.1" 200 15947
+"GET /cars/ HTTP/1.1" 200 13437
+"GET /booking/?car_id=2 HTTP/1.1" 200 29920
+"GET /drivers/ HTTP/1.1" 200 13310
+"GET /admin/ HTTP/1.1" 200 6612
+"GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+"GET /static/admin/css/base.css HTTP/1.1" 304 0
+"GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+"GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+"GET /static/admin/js/theme.js HTTP/1.1" 304 0
+"GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+"GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+"GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+"GET /admin/app/driver/ HTTP/1.1" 200 10080
+"GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+"GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+"GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+"GET /static/admin/js/core.js HTTP/1.1" 304 0
+"GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /static/admin/js/actions.js HTTP/1.1" 304 0
+"GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+"GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+"GET /static/admin/img/search.svg HTTP/1.1" 304 0
+"GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+"GET /static/admin/js/filters.js HTTP/1.1" 304 0
+"GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+"GET /admin/app/driver/3/change/ HTTP/1.1" 200 14441
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /static/admin/css/forms.css HTTP/1.1" 304 0
+"GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+"GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+"GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+"POST /admin/app/driver/3/change/ HTTP/1.1" 302 0
+"GET /admin/app/driver/ HTTP/1.1" 200 10278
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /static/admin/img/icon-yes.svg HTTP/1.1" 304 0
+"GET /drivers/ HTTP/1.1" 200 13289
+"GET /media/drivers/IMG_20231215_123813.jpg HTTP/1.1" 200 2874927
+"GET /admin/ HTTP/1.1" 200 6930
+"GET /admin/app/driver/ HTTP/1.1" 200 10080
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/app/driver/4/change/ HTTP/1.1" 200 14459
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"POST /admin/app/driver/4/change/ HTTP/1.1" 302 0
+"GET /admin/app/driver/ HTTP/1.1" 200 10277
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+Not Found: /driver/
+"GET /driver/ HTTP/1.1" 404 6119
+"GET /drivers/ HTTP/1.1" 200 13253
+"GET /media/drivers/IMG_20231215_123813.jpg HTTP/1.1" 304 0
+"GET /media/drivers/1000032983-02.jpeg HTTP/1.1" 200 3926607
+"GET / HTTP/1.1" 200 6054
+"GET / HTTP/1.1" 200 6054
+"GET /booked-cars/ HTTP/1.1" 200 15596
+"GET /drivers/ HTTP/1.1" 200 13253
+"GET /media/drivers/IMG_20231215_123813.jpg HTTP/1.1" 304 0
+"GET /media/drivers/1000032983-02.jpeg HTTP/1.1" 304 0
+"GET /drivers/ HTTP/1.1" 200 13253
+"GET /media/drivers/1000032983-02.jpeg HTTP/1.1" 304 0
+"GET /media/drivers/IMG_20231215_123813.jpg HTTP/1.1" 304 0
+"GET /staff/returned_cars/ HTTP/1.1" 200 32771
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 6054
+"GET /cars/ HTTP/1.1" 200 13437
+"GET /cars/ HTTP/1.1" 200 13437
+"GET /booked-cars/ HTTP/1.1" 200 15596
+"GET /cars/ HTTP/1.1" 200 13437
+"GET /cars/ HTTP/1.1" 200 13437
+Watching for file changes with StatReloader
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /cars/ HTTP/1.1" 200 13437
+"GET /booking/?car_id=2 HTTP/1.1" 200 29920
+"GET /booked-cars/ HTTP/1.1" 200 15596
+"GET /staff/returned_cars/ HTTP/1.1" 200 32771
+"GET /about/ HTTP/1.1" 200 10450
+"GET / HTTP/1.1" 200 6054
+"GET /booked-cars/ HTTP/1.1" 200 15596
+"GET / HTTP/1.1" 200 6054
+"GET /cars/ HTTP/1.1" 200 13437
+"GET /about/ HTTP/1.1" 200 10450
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 6054
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 6131
+"GET /admin/ HTTP/1.1" 200 7214
+"POST /admin/logout/ HTTP/1.1" 200 3576
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 4181
+"GET /static/admin/css/login.css HTTP/1.1" 304 0
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 8010
+"GET /admin/app/customer/ HTTP/1.1" 200 11598
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/app/customer/ HTTP/1.1" 200 11598
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/auth/group/ HTTP/1.1" 200 8603
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/app/customer/ HTTP/1.1" 200 11598
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/auth/user/ HTTP/1.1" 200 14225
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /static/admin/img/icon-no.svg HTTP/1.1" 304 0
+"GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+"GET /admin/auth/user/ HTTP/1.1" 200 14225
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET / HTTP/1.1" 200 6003
+"GET /admin/ HTTP/1.1" 200 8010
+"GET /admin/auth/user/ HTTP/1.1" 200 14225
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/app/customer/ HTTP/1.1" 200 11598
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 6003
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 6131
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /admin-dashboard/ HTTP/1.1" 200 16589
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 6024
+"GET /booked-cars/ HTTP/1.1" 200 20326
+"GET / HTTP/1.1" 200 6024
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/rguktrkvalley/.local/lib/python3.8/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+"GET / HTTP/1.1" 400 70759
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 6024
+"GET / HTTP/1.1" 200 6024
+"GET /cars/ HTTP/1.1" 200 13407
+"GET /booked-cars/ HTTP/1.1" 200 20326
+"GET / HTTP/1.1" 200 6024
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 3704
+"POST /admin/login/?next=/admin/ HTTP/1.1" 200 3869
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 8010
+"GET /admin/ HTTP/1.1" 200 8010
+"GET / HTTP/1.1" 200 6003
+"GET /staff/booked_cars/ HTTP/1.1" 200 6114
+"GET /staff/returned_cars/ HTTP/1.1" 200 32720
+"GET /staff/booked_cars/ HTTP/1.1" 200 6114
+"GET /staff/booked_cars/ HTTP/1.1" 200 6114
+"GET /staff/booked_cars/ HTTP/1.1" 200 6114
+"GET /staff/booked_cars/ HTTP/1.1" 200 6114
+"GET /staff/booked_cars/ HTTP/1.1" 200 6114
+"GET /staff/booked_cars/ HTTP/1.1" 200 6114
+"GET /staff/returned_cars/ HTTP/1.1" 200 32720
+"GET /logout/ HTTP/1.1" 302 0
+"GET /login/ HTTP/1.1" 200 1293
+"GET /static/js/app.js HTTP/1.1" 404 1786
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 6054
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /staff/returned_cars/ HTTP/1.1" 200 32771
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 6054
+"GET /staff/booked_cars/ HTTP/1.1" 200 6165
+"GET /admin/ HTTP/1.1" 200 7214
+"GET /admin/app/booking/ HTTP/1.1" 200 10880
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /admin/app/booking/4/change/ HTTP/1.1" 200 24576
+"GET /admin/jsi18n/ HTTP/1.1" 200 3343
+"GET /static/admin/js/calendar.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+"GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-calendar.svg HTTP/1.1" 304 0
+"GET /static/admin/img/icon-clock.svg HTTP/1.1" 304 0
+"POST /admin/logout/ HTTP/1.1" 200 3576

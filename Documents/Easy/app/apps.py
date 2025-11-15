@@ -5,4 +5,4 @@ class AppConfig(AppConfig):
     name = 'app'
 
     def ready(self):
-        import app.signals   # ✅ this ensures signals.py runs
+        import app.signals   

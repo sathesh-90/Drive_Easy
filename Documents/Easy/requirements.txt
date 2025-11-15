@@ -1,0 +1,19 @@
+Django==5.0.2
+gunicorn
+whitenoise
+psycopg2-binary
+dj-database-url
+python-dotenv
+python-decouple
+requests
+
+# image handling
+Pillow
+
+# optional: if you store media/static on S3
+django-storages
+boto3
+
+# optional dev / debugging
+django-debug-toolbar
+psycopg2-binary

@@ -1,67 +1,65 @@
-# views.py - Add these authentication views to your existing views.py
-from django.contrib.auth.decorators import user_passes_test
-import requests
+# views.py
 import logging
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import JsonResponse
-from .forms import BookingForm
+from decimal import Decimal, InvalidOperation
+
+import requests
 from django.conf import settings
-from django.db.models import Q
-from .models import Car,Booking
-from django.shortcuts import render, redirect
-from django.shortcuts import get_object_or_404
-from .models import Car
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.db.models import Q, Sum
 
+from .forms import BookingForm
+from .models import Booking, Car, Customer, Driver
 
-
-# Set up logging
 logger = logging.getLogger(__name__)
+User = get_user_model()
 
+
+# -----------------------
+# Basic pages
+# -----------------------
 def index(request):
-    return render(request, 'app/index.html')
-
-def cars(request):
-    query = request.GET.get('q', '')
-    if query:
-        cars = Car.objects.filter(
-            Q(category__icontains=query) |
-            Q(ac_type__icontains=query)|
-            Q(fuel_consumption__icontains=query)
-        )
-    else:
-        cars = Car.objects.all()
-    return render(request, 'app/cars.html', {'cars': cars, 'query': query})
+    return render(request, "app/index.html")
 
 
 def about(request):
-    return render(request, 'app/about.html')
+    return render(request, "app/about.html")
 
 
-# app/views.py
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
+def cars(request):
+    query = request.GET.get("q", "").strip()
+    if query:
+        cars_qs = Car.objects.filter(
+            Q(category__icontains=query)
+            | Q(ac_type__icontains=query)
+            | Q(fuel_consumption__icontains=query)
+        )
+    else:
+        cars_qs = Car.objects.all()
+    return render(request, "app/cars.html", {"cars": cars_qs, "query": query})
 
-from django.contrib.auth.decorators import login_required
 
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from .models import Car, Booking, Customer
-from .forms import BookingForm
-
-
-from django.contrib import messages
-
+# -----------------------
+# Booking flow
+# -----------------------
 @login_required
 def booking_view(request):
+    """
+    Create a booking for a given car. Expects car_id as GET or POST param.
+    Calculates amounts and saves booking. Ensures customer record exists.
+    """
     car_id = request.GET.get("car_id") or request.POST.get("car_id")
+    if not car_id:
+        messages.error(request, "No car specified.")
+        return redirect("cars")
+
     car = get_object_or_404(Car, id=car_id)
-    customer, created = Customer.objects.get_or_create(user=request.user)
+    customer_profile, _ = Customer.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
         form = BookingForm(request.POST)
@@ -70,433 +68,339 @@ def booking_view(request):
             booking.car = car
             booking.customer = request.user
 
-            # Dynamic calculation
-            km_to_destination = float(request.POST.get("km_to_destination", 0))
-            hours_used = max(int(request.POST.get("hours_used", 4)), 4)
-            drive_type = request.POST.get("drive_type")
+            # Read dynamic fields (with safe defaults)
+            try:
+                kms_to_destination = int(request.POST.get("kms_to_destination") or request.POST.get("km_to_destination") or 0)
+            except (ValueError, TypeError):
+                kms_to_destination = 0
 
-            # Handle self-drive Aadhaar & License
+            try:
+                hours_used = int(request.POST.get("hours_used") or 4)
+            except (ValueError, TypeError):
+                hours_used = 4
+            hours_used = max(hours_used, 4)
+
+            drive_type = request.POST.get("drive_type", "self_drive")
+
+            # For self-drive store aadhar/license in Customer
             if drive_type == "self_drive":
-                aadhaar_number = request.POST.get("aadhaar_number")
-                license_number = request.POST.get("license_number")
+                aadhaar_number = request.POST.get("aadhaar_number", "").strip()
+                license_number = request.POST.get("license_number", "").strip()
                 if not aadhaar_number or not license_number:
                     messages.error(request, "Aadhaar and License required for self-drive.")
-                    return render(request, "app/booking.html", {"form": form, "car": car, "customer": customer})
+                    return render(request, "app/booking.html", {"form": form, "car": car, "customer": customer_profile})
+                customer_profile.aadhar_number = aadhaar_number
+                customer_profile.license_number = license_number
+                customer_profile.save()
 
-                customer.aadhar_number = aadhaar_number
-                customer.license_number = license_number
-                customer.save()
-
-            # Calculate total, advance, pending
-            per_hour_charge = car.price_per_hour
-            per_km_charge = car.price_per_km
-            hourly_amount = per_hour_charge * hours_used
-            km_amount = per_km_charge * km_to_destination
-            total_amount = max(hourly_amount, km_amount, per_hour_charge*4)
+            # Calculate fares (use Car fields)
+            per_hour_charge = Decimal(str(car.price_per_hour or 0))
+            per_km_charge = Decimal(str(car.price_per_km or 0))
+            hourly_amount = per_hour_charge * Decimal(hours_used)
+            km_amount = per_km_charge * Decimal(kms_to_destination)
+            minimum_base = per_hour_charge * Decimal(4)
+            total_amount = max(hourly_amount, km_amount, minimum_base)
 
             if drive_type == "with_driver":
-                total_amount += 500
+                total_amount += Decimal("500.00")
 
-            advance_payment = total_amount * 0.2
-            pending_payment = total_amount - advance_payment
+            advance_payment = (total_amount * Decimal("0.20")).quantize(Decimal("0.01"))
+            pending_payment = (total_amount - advance_payment).quantize(Decimal("0.01"))
 
-            # Save booking
-            booking.km_to_destination = km_to_destination
+            # Save booking fields (ensure decimals are Decimal)
+            booking.kms_to_destination = kms_to_destination
             booking.hours_used = hours_used
-            booking.total_amount = total_amount
+            booking.total_amount = total_amount.quantize(Decimal("0.01"))
             booking.advance_payment = advance_payment
             booking.pending_payment = pending_payment
             booking.drive_type = drive_type
-            booking.start_km_reading = 0  # Set a default to avoid NOT NULL error
+            booking.start_km_reading = booking.start_km_reading or 0
             booking.save()
 
-            # Reduce car stock
-            car.total_cars -= 1
-            car.save()
+            # Decrement fleet availability
+            if car.total_cars and car.total_cars > 0:
+                car.total_cars -= 1
+                car.save()
 
             messages.success(request, f"Booking successful! Pending Amount: ₹{pending_payment:.2f}")
-            return redirect("booked_cars")  # Redirect to booked cars page
-
+            return redirect("booked_cars")
     else:
         form = BookingForm()
 
-    return render(request, "app/booking.html", {"form": form, "car": car, "customer": customer})
+    return render(request, "app/booking.html", {"form": form, "car": car, "customer": customer_profile})
 
 
-
-
-
-# ==================== AUTHENTICATION VIEWS ====================
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model, authenticate, login, logout
-from django.contrib import messages
-from .models import Customer
-
+# -----------------------
+# Authentication
+# -----------------------
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('index')
+        return redirect("index")
 
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
-        profile_pic = request.FILES.get('profile_pic')
+    if request.method == "POST":
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
+        password1 = request.POST.get("password1", "")
+        password2 = request.POST.get("password2", "")
+        profile_pic = request.FILES.get("profile_pic")
 
         if password1 != password2:
             messages.error(request, "Passwords do not match.")
-            return render(request, 'app/register.html')
+            return render(request, "app/register.html")
 
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists.")
-            return render(request, 'app/register.html')
+            return render(request, "app/register.html")
+
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email already exists.")
-            return render(request, 'app/register.html')
+            return render(request, "app/register.html")
 
-        # Create user
         user = User.objects.create_user(username=username, email=email, password=password1)
-
-        # Safely create Customer
-        Customer.objects.get_or_create(user=user, defaults={'profile_pic': profile_pic})
-
+        # create customer profile with optional profile pic
+        Customer.objects.get_or_create(user=user, defaults={"profile_pic": profile_pic})
         login(request, user)
-        return redirect('login')
+        return redirect("index")
 
-    return render(request, 'app/register.html')
+    return render(request, "app/register.html")
 
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('index')
+        return redirect("index")
 
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "")
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('index')
+            return redirect("index")
         else:
             messages.error(request, "Invalid username or password")
-
-    return render(request, 'app/login.html')
+    return render(request, "app/login.html")
 
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
-
+    return redirect("login")
 
 
 @login_required
 def profile_view(request):
-    """User profile view"""
-    if request.method == 'POST':
-        # Update user profile
+    """View and update basic user profile (first_name, last_name, email)."""
+    if request.method == "POST":
         user = request.user
-        user.first_name = request.POST.get('first_name', '').strip()
-        user.last_name = request.POST.get('last_name', '').strip()
-        user.email = request.POST.get('email', '').strip()
-        
-        # Basic validation
+        user.first_name = request.POST.get("first_name", "").strip()
+        user.last_name = request.POST.get("last_name", "").strip()
+        user.email = request.POST.get("email", "").strip()
+
         if user.first_name and user.email:
             try:
                 user.save()
-                messages.success(request, 'Profile updated successfully!')
-            except Exception as e:
-                messages.error(request, 'Error updating profile. Please try again.')
+                messages.success(request, "Profile updated successfully!")
+            except Exception:
+                messages.error(request, "Error updating profile. Please try again.")
         else:
-            messages.error(request, 'Please fill in all required fields.')
-    
-    return render(request, 'app/profile.html')
+            messages.error(request, "Please fill in all required fields.")
 
-# ==================== EXISTING VIEWS ====================
+    # Ensure a customer profile exists
+    Customer.objects.get_or_create(user=request.user)
+    return render(request, "app/profile.html")
 
+
+# -----------------------
+# Distance / Maps helpers
+# -----------------------
 def distance_calculator(request):
-    """Render the distance calculator template with API key"""
-    api_key = getattr(settings, 'GOOGLE_MAPS_API_KEY', None)
-    
+    api_key = getattr(settings, "GOOGLE_MAPS_API_KEY", None)
     if not api_key:
         logger.error("Google Maps API key not found in settings")
     else:
-        logger.info(f"API key found: {api_key[:10]}...")
-    
-    return render(request, 'app/distance_calculator.html', {
-        'google_maps_api_key': api_key
-    })
-
-
-
+        logger.debug("Google Maps API key present")
+    return render(request, "app/distance_calculator.html", {"google_maps_api_key": api_key})
 
 
 def calculate_distance(request):
-    """Calculate distance between two points using Google Maps API via AJAX"""
-    if request.method == 'POST':
-        origin = request.POST.get('origin')
-        destination = request.POST.get('destination')
-        
-        logger.info(f"Distance calculation request: {origin} -> {destination}")
-        
-        if not origin or not destination:
-            logger.error("Missing origin or destination")
-            return JsonResponse({'error': 'Both origin and destination are required'})
-        
-        api_key = getattr(settings, 'GOOGLE_MAPS_API_KEY', None)
-        if not api_key:
-            logger.error("Google Maps API key not configured")
-            return JsonResponse({'error': 'Google Maps API key not configured. Please check your settings.'})
-        
-        url = 'https://maps.googleapis.com/maps/api/distancematrix/json'
-        
-        params = {
-            'origins': origin,
-            'destinations': destination,
-            'units': 'metric',
-            'key': api_key
-        }
-        
-        logger.info(f"Making API request to: {url}")
-        logger.info(f"Request params: origins={origin}, destinations={destination}, units=metric")
-        
-        try:
-            response = requests.get(url, params=params, timeout=10)
-            logger.info(f"API Response status code: {response.status_code}")
-            
-            response_text = response.text
-            logger.info(f"API Response: {response_text}")
-            
-            if response.status_code != 200:
-                logger.error(f"HTTP Error: {response.status_code}")
-                return JsonResponse({'error': f'HTTP Error: {response.status_code}'})
-            
-            data = response.json()
-            
-            if data['status'] == 'OK':
-                element = data['rows'][0]['elements'][0]
-                logger.info(f"Element status: {element['status']}")
-                
-                if element['status'] == 'OK':
-                    distance = element['distance']['text']
-                    duration = element['duration']['text']
-                    distance_value = element['distance']['value']
-                    duration_value = element['duration']['value']
-                    
-                    fare_per_km = 12.50
-                    fare_per_hour = 200
-                    
-                    distance_km = distance_value / 1000
-                    duration_hours = duration_value / 3600
-                    
-                    distance_fare = distance_km * fare_per_km
-                    time_fare = duration_hours * fare_per_hour
-                    estimated_fare = max(distance_fare, time_fare)
-                    
-                    logger.info(f"Calculation successful: {distance}, {duration}")
-                    
-                    return JsonResponse({
-                        'success': True,
-                        'distance': distance,
-                        'duration': duration,
-                        'distance_km': round(distance_km, 2),
-                        'duration_hours': round(duration_hours, 1),
-                        'distance_fare': round(distance_fare, 2),
-                        'time_fare': round(time_fare, 2),
-                        'estimated_fare': round(estimated_fare, 2),
-                        'origin': origin,
-                        'destination': destination
-                    })
-                else:
-                    error_msg = f"Route calculation failed: {element['status']}"
-                    if element['status'] == 'NOT_FOUND':
-                        error_msg = "One or both locations could not be found. Please check your addresses."
-                    elif element['status'] == 'ZERO_RESULTS':
-                        error_msg = "No route could be found between these locations."
-                    
-                    logger.error(f"Element error: {element['status']}")
-                    return JsonResponse({'error': error_msg})
-            else:
-                error_msg = f"API Error: {data['status']}"
-                if data['status'] == 'REQUEST_DENIED':
-                    error_msg = "API request denied. Please check your API key and billing settings."
-                elif data['status'] == 'INVALID_REQUEST':
-                    error_msg = "Invalid request. Please check your input locations."
-                elif data['status'] == 'OVER_QUERY_LIMIT':
-                    error_msg = "API quota exceeded. Please try again later."
-                elif data['status'] == 'UNKNOWN_ERROR':
-                    error_msg = "Unknown API error. Please try again."
-                
-                logger.error(f"API Status error: {data['status']}")
-                if 'error_message' in data:
-                    logger.error(f"API Error message: {data['error_message']}")
-                    error_msg += f" Details: {data['error_message']}"
-                
-                return JsonResponse({'error': error_msg})
-                
-        except requests.exceptions.Timeout:
-            logger.error("Request timeout")
-            return JsonResponse({'error': 'Request timeout. Please try again.'})
-        except requests.exceptions.ConnectionError:
-            logger.error("Connection error")
-            return JsonResponse({'error': 'Connection error. Please check your internet connection.'})
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Request exception: {str(e)}")
-            return JsonResponse({'error': f'Request error: {str(e)}'})
-        except ValueError as e:
-            logger.error(f"JSON parsing error: {str(e)}")
-            return JsonResponse({'error': 'Invalid response from Google API'})
-        except Exception as e:
-            logger.error(f"Unexpected error: {str(e)}")
-            return JsonResponse({'error': f'Unexpected error: {str(e)}'})
-    
-    return JsonResponse({'error': 'Invalid request method'})
+    """
+    AJAX endpoint to call Google Distance Matrix and return estimated fare.
+    Expects POST with 'origin' and 'destination'.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"})
+
+    origin = request.POST.get("origin", "").strip()
+    destination = request.POST.get("destination", "").strip()
+
+    if not origin or not destination:
+        return JsonResponse({"error": "Both origin and destination are required"})
+
+    api_key = getattr(settings, "GOOGLE_MAPS_API_KEY", None)
+    if not api_key:
+        logger.error("Google Maps API key not configured")
+        return JsonResponse({"error": "Google Maps API key not configured. Please check your settings."})
+
+    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    params = {"origins": origin, "destinations": destination, "units": "metric", "key": api_key}
+
+    try:
+        resp = requests.get(url, params=params, timeout=10)
+        logger.debug("Google API response: %s", resp.text)
+        if resp.status_code != 200:
+            return JsonResponse({"error": f"HTTP Error: {resp.status_code}"})
+
+        data = resp.json()
+        if data.get("status") != "OK":
+            err = data.get("status", "UNKNOWN_ERROR")
+            return JsonResponse({"error": f"API Error: {err}", "details": data.get("error_message")})
+
+        element = data["rows"][0]["elements"][0]
+        if element.get("status") != "OK":
+            return JsonResponse({"error": f"Route calculation failed: {element.get('status')}"})
+
+        distance_text = element["distance"]["text"]
+        duration_text = element["duration"]["text"]
+        distance_value = element["distance"]["value"]  # meters
+        duration_value = element["duration"]["value"]  # seconds
+
+        fare_per_km = Decimal("12.50")
+        fare_per_hour = Decimal("200")
+
+        distance_km = Decimal(distance_value) / Decimal("1000")
+        duration_hours = Decimal(duration_value) / Decimal("3600")
+
+        distance_fare = (distance_km * fare_per_km).quantize(Decimal("0.01"))
+        time_fare = (duration_hours * fare_per_hour).quantize(Decimal("0.01"))
+        estimated_fare = max(distance_fare, time_fare)
+
+        return JsonResponse(
+            {
+                "success": True,
+                "distance": distance_text,
+                "duration": duration_text,
+                "distance_km": float(distance_km),
+                "duration_hours": float(duration_hours),
+                "distance_fare": float(distance_fare),
+                "time_fare": float(time_fare),
+                "estimated_fare": float(estimated_fare),
+                "origin": origin,
+                "destination": destination,
+            }
+        )
+    except requests.exceptions.Timeout:
+        logger.exception("Maps API timeout")
+        return JsonResponse({"error": "Request timeout. Please try again."})
+    except requests.exceptions.RequestException as e:
+        logger.exception("Maps API request exception")
+        return JsonResponse({"error": f"Request error: {str(e)}"})
+    except (KeyError, ValueError) as e:
+        logger.exception("Maps API parse error")
+        return JsonResponse({"error": "Invalid response from Google API"})
 
 
-
-from django.contrib.auth.decorators import login_required
-from .models import Booking
-
+# -----------------------
+# Booked / Returned lists
+# -----------------------
 @login_required
 def booked_cars_view(request):
+    """List bookings: staff sees all pending bookings; customers see their own."""
     if request.user.is_staff:
         total_cars_booked = Booking.objects.filter(is_returned=False).count()
         r_total_cars_booked = Booking.objects.filter(is_returned=True).count()
-        bookings = Booking.objects.filter(is_returned=False)
+        bookings = Booking.objects.filter(is_returned=False).order_by("-start_datetime")
     else:
         total_cars_booked = Booking.objects.filter(customer=request.user, is_returned=False).count()
-        r_total_cars_booked = Booking.objects.filter(is_returned=True).count()
-        bookings = Booking.objects.filter(customer=request.user)
+        r_total_cars_booked = Booking.objects.filter(customer=request.user, is_returned=True).count()
+        bookings = Booking.objects.filter(customer=request.user).order_by("-start_datetime")
 
     context = {
-        'bookings': bookings,
-        'total_cars_booked': total_cars_booked,
-        "r_total_cars_booked":r_total_cars_booked,
+        "bookings": bookings,
+        "total_cars_booked": total_cars_booked,
+        "r_total_cars_booked": r_total_cars_booked,
     }
-    return render(request, 'app/booked_cars.html', context)
+    return render(request, "app/booked_cars.html", context)
 
-
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .models import Booking
 
 @login_required
 def return_cars_view(request):
-
+    """Staff view of returned cars (for staff dashboard)."""
     if not request.user.is_staff:
-        return redirect('index')  
-
-    bookings = Booking.objects.filter(is_returned=True)
+        return redirect("index")
+    bookings = Booking.objects.filter(is_returned=True).order_by("-returned_at")
     returned_cars = bookings.count()
-
-    context = {
-        'bookings': bookings,
-        'returned_cars': returned_cars,
-    }
-    return render(request, 'app/return_cars.html', context)
+    return render(request, "app/return_cars.html", {"bookings": bookings, "returned_cars": returned_cars})
 
 
-
-
-
-
-
-
-
-
-
-# views.py
-from django.utils import timezone
-from django.contrib.admin.views.decorators import staff_member_required
-from decimal import Decimal
-
-
-@staff_member_required
+@login_required
 def returns_list_view(request):
-   bookings = Booking.objects.filter(customer=request.user, is_returned=True).order_by('-returned_at')
-   return render(request, "app/customer_returned_cars.html", {"bookings": bookings})
+    """Customer view: their returned bookings."""
+    bookings = Booking.objects.filter(customer=request.user, is_returned=True).order_by("-returned_at")
+    return render(request, "app/customer_returned_cars.html", {"bookings": bookings})
 
 
-@login_required
-def settings_view(request):
-    return render(request, "settings.html")
-
-
-
-from .models import Driver
-
-@login_required
-def drivers_view(request):
-    drivers = Driver.objects.all()
-    total_drivers = Driver.objects.all().count()
-    return render(request, "app/drivers.html", {"drivers": drivers,"total_drivers":total_drivers})
-
-
-
-@staff_member_required
-def staff_booked_cars_view(request):
-    bookings = Booking.objects.filter(is_returned=False).order_by('-start_datetime')
-    total_cars_booked = Booking.objects.filter(is_returned=False).count()
-    r_total_cars_booked = Booking.objects.filter(is_returned=True).count()
-
-    return render(
-        request,
-        "app/staff_booked_cars.html",
-        {
-            "bookings": bookings,
-            "total_cars_booked": total_cars_booked,
-            "r_total_cars_booked": r_total_cars_booked,
-        },
-    )
-
-
-@staff_member_required
-def staff_returned_cars_list_view(request):
-    bookings = Booking.objects.filter(is_returned=True).order_by('-returned_at')
-    return render(request, 'app/staff_returned_cars_list.html', {'bookings': bookings})
-
-
-
-
-
+# -----------------------
+# Staff actions (mark returned)
+# -----------------------
 @user_passes_test(lambda u: u.is_staff)
 def staff_returned_cars_mark(request, booking_id):
+    """
+    POST handler to mark a booking returned and optionally record damage + fee.
+    Form fields expected:
+      - damage_reported : checkbox "on" when present
+      - damage_fee : numeric string (optional)
+    """
     booking = get_object_or_404(Booking, id=booking_id)
-    
-    if request.method == "POST":
-        damage_fee = request.POST.get("damage_fee")
-        if damage_fee:
-            # Convert damage_fee to Decimal before adding
-            booking.damage_fee = Decimal(damage_fee)
-            booking.pending_payment += Decimal(damage_fee)  
 
-        # only increment fleet if this booking was not already marked returned
+    if request.method == "POST":
+        damage_flag = request.POST.get("damage_reported")
+        damage_fee_raw = (request.POST.get("damage_fee") or "").strip()
+
+        damage_reported = bool(damage_flag)
+        damage_fee = Decimal("0.00")
+        if damage_fee_raw:
+            try:
+                damage_fee = Decimal(damage_fee_raw)
+                if damage_fee < 0:
+                    damage_fee = Decimal("0.00")
+            except (InvalidOperation, ValueError):
+                damage_fee = Decimal("0.00")
+
+        # Update booking's damage fields
+        booking.damage_reported = damage_reported
+        booking.damage_fee = damage_fee
+
+        # If booking not already returned, increment fleet and set returned flags/time
         if not booking.is_returned:
             car = booking.car
             car.total_cars = (car.total_cars or 0) + 1
             car.save()
-
             booking.is_returned = True
             booking.returned_at = timezone.now()
-            # Recalculate pending_payment / total if needed
-            booking.total_amount = (booking.total_amount or Decimal('0.00')) + (booking.damage_fee or Decimal('0.00'))
-            booking.pending_payment = (booking.total_amount or Decimal('0.00')) - (booking.advance_payment or Decimal('0.00'))
+
+        # Recalculate totals:
+        # We assume booking.total_amount previously did NOT include damage_fee.
+        base_total = booking.total_amount or Decimal("0.00")
+        booking.total_amount = (base_total + damage_fee).quantize(Decimal("0.01"))
+        booking.pending_payment = (booking.total_amount - (booking.advance_payment or Decimal("0.00"))).quantize(
+            Decimal("0.01")
+        )
 
         booking.save()
-    
-    return redirect('staff_returned_cars_list')
+        messages.success(request, "Booking updated and marked returned.")
+
+    return redirect("staff_returned_cars_list")
 
 
 @staff_member_required
 def staff_returned_cars_view(request, booking_id):
+    """
+    Quick mark-return (no damage info). If damage was already set earlier, respects it.
+    """
     booking = get_object_or_404(Booking, id=booking_id)
     if booking.is_returned:
         messages.info(request, f"The booking for {booking.car.category} is already returned.")
         return redirect("staff_booked_cars")
 
-    # mark returned and increment fleet
     booking.is_returned = True
     booking.returned_at = timezone.now()
 
@@ -504,47 +408,66 @@ def staff_returned_cars_view(request, booking_id):
     car.total_cars = (car.total_cars or 0) + 1
     car.save()
 
-    if booking.damage_reported and booking.damage_fee:
-        booking.total_amount = (booking.total_amount or Decimal('0.00')) + booking.damage_fee
-    booking.pending_payment = (booking.total_amount or Decimal('0.00')) - (booking.advance_payment or Decimal('0.00'))
+    damage_fee = booking.damage_fee or Decimal("0.00")
+    if booking.damage_reported and damage_fee > 0:
+        booking.total_amount = (booking.total_amount or Decimal("0.00")) + damage_fee
 
+    booking.pending_payment = (booking.total_amount or Decimal("0.00")) - (booking.advance_payment or Decimal("0.00"))
     booking.save()
+    messages.success(request, "Booking marked returned.")
     return redirect("staff_booked_cars")
 
 
+@staff_member_required
+def staff_booked_cars_view(request):
+    bookings = Booking.objects.filter(is_returned=False).order_by("-start_datetime")
+    total_cars_booked = bookings.count()
+    r_total_cars_booked = Booking.objects.filter(is_returned=True).count()
+    return render(
+        request,
+        "app/staff_booked_cars.html",
+        {"bookings": bookings, "total_cars_booked": total_cars_booked, "r_total_cars_booked": r_total_cars_booked},
+    )
 
-from django.db.models import Sum
 
-from django.shortcuts import render
-from django.contrib.auth import views as auth_views
+@staff_member_required
+def staff_returned_cars_list_view(request):
+    bookings = Booking.objects.filter(is_returned=True).order_by("-returned_at")
+    return render(request, "app/staff_returned_cars_list.html", {"bookings": bookings})
 
-def password_reset_done_custom(request):
-    return render(request, 'app/password_reset_done.html')
 
+# -----------------------
+# Drivers and admin
+# -----------------------
+@login_required
+def drivers_view(request):
+    drivers = Driver.objects.all()
+    total_drivers = drivers.count()
+    return render(request, "app/drivers.html", {"drivers": drivers, "total_drivers": total_drivers})
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_dashboard(request):
     if not request.user.is_staff:
-        return redirect('index')
-    
-    # Basic stats
+        return redirect("index")
+
     total_bookings = Booking.objects.count()
-    total_revenue = Booking.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    total_revenue = Booking.objects.aggregate(Sum("total_amount"))["total_amount__sum"] or Decimal("0.00")
     total_drivers = Driver.objects.count()
     total_cars = Car.objects.count()
     returned_cars = Booking.objects.filter(is_returned=True).count()
     pending_bookings = Booking.objects.filter(is_returned=False).count()
-    
+
     context = {
-        'total_bookings': total_bookings,
-        'total_revenue': total_revenue,
-        'total_drivers': total_drivers,
-        'total_cars': total_cars,
-        'returned_cars': returned_cars,
-        'pending_bookings': pending_bookings,
+        "total_bookings": total_bookings,
+        "total_revenue": total_revenue,
+        "total_drivers": total_drivers,
+        "total_cars": total_cars,
+        "returned_cars": returned_cars,
+        "pending_bookings": pending_bookings,
     }
-    return render(request, 'app/admin_dashboard.html', context)
+    return render(request, "app/admin_dashboard.html", context)
 
 
-
+def password_reset_done_custom(request):
+    return render(request, "app/password_reset_done.html")

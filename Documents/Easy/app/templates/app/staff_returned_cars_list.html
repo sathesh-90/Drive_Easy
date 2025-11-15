@@ -549,13 +549,15 @@
 
             <!-- Damage Report -->
             <div class="damage-indicator {% if booking.damage_reported %}damage-true{% else %}damage-false{% endif %}">
-              <i class="fas fa-{% if booking.damage_reported %}exclamation-triangle{% else %}check-shield{% endif %}"></i>
-              {% if booking.damage_reported %}
-                Damage Reported - Fee: ₹{{ booking.damage_fee|floatformat:2 }}
-              {% else %}
-                No Damage damage
-              {% endif %}
-            </div>
+  <i class="fas fa-{% if booking.damage_reported %}exclamation-triangle{% else %}shield-alt{% endif %}"></i>
+
+  {% if booking.damage_reported %}
+      Damage Reported — Fee: ₹{{ booking.damage_fee|floatformat:2 }}
+  {% else %}
+      No Damage
+  {% endif %}
+</div>
+
 
             <!-- Additional Info -->
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
