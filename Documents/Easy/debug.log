@@ -15410,3 +15410,20 @@ Watching for file changes with StatReloader
 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 304 0
 "GET /static/admin/img/icon-clock.svg HTTP/1.1" 304 0
 "POST /admin/logout/ HTTP/1.1" 200 3576
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 5664
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 6131
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
+Watching for file changes with StatReloader
+/home/rguktrkvalley/Documents/Easy/Easy/settings.py changed, reloading.
